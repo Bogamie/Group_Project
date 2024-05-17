@@ -15,9 +15,11 @@ git status
 
 ```
 git add .
+```
 
 or 
 
+```
 git add lib/main.dart
 ```
 
