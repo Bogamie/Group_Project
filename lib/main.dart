@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:group_project_calendar/reuse_element.dart';
 
 void main() {
@@ -21,28 +22,67 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      appBar: TopMenu(),
-      // extendBodyBehindAppBar: true,
-      // body: CalendarType1(),
+    ScreenUtil.init(context);
+    return Scaffold(
+      appBar: const TopMenu(),
+      extendBodyBehindAppBar: true,
+      body: CalendarType1(),
     );
   }
 }
 
-/*
 class CalendarType1 extends StatelessWidget {
-  List<String> _weekList = ['일', '월', '화', '수', '목', '금', '토'];
+  CalendarType1({super.key});
 
-  void printWeek() {
-    return Container(
+  final List<String> _weekList = ['일', '월', '화', '수', '목', '금', '토'];
 
-    )
-  }
   @override
   Widget build(BuildContext context) {
     return Column(
-
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: <Widget>[
+        SizedBox(
+          height: 0.055.sh,
+        ),
+        const Text(
+          "4",
+          style: TextStyle(
+            fontWeight: FontWeight.w900,
+            fontSize: 32,
+          ),
+        ),
+        Row(
+          children: _weekList
+              .asMap()
+              .map(
+                (index, day) => MapEntry(
+                  index,
+                  Expanded(
+                    child: Container(
+                      height: 0.03.sh,
+                      padding: const EdgeInsets.only(top: 1, bottom: 1),
+                      color: Colors.transparent,
+                      alignment: Alignment.center,
+                      child: Text(
+                        day,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: index == 0
+                              ? const Color.fromRGBO(238, 75, 43, 1)
+                              : index == 6
+                                  ? const Color.fromRGBO(0, 150, 255, 1)
+                                  : Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              )
+              .values
+              .toList(),
+        )
+      ],
     );
   }
 }
-*/
