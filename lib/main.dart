@@ -1,3 +1,4 @@
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:group_project_calendar/reuse_element.dart';
@@ -35,6 +36,7 @@ class CalendarType1 extends StatelessWidget {
   CalendarType1({super.key});
 
   final List<String> _weekList = ['일', '월', '화', '수', '목', '금', '토'];
+  int _count = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -45,11 +47,14 @@ class CalendarType1 extends StatelessWidget {
           height: 0.055.sh,
         ),
         const Text(
-          "4",
+          "5",
           style: TextStyle(
             fontWeight: FontWeight.w900,
             fontSize: 32,
           ),
+        ),
+        SizedBox(
+          height: 0.005.sh,
         ),
         Row(
           children: _weekList
@@ -81,7 +86,23 @@ class CalendarType1 extends StatelessWidget {
               )
               .values
               .toList(),
-        )
+        ),
+        Container(
+          width: 0.99.sw,
+          height: 1,
+          decoration: BoxDecoration(
+            color: const Color.fromRGBO(229, 229, 229, 1),
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: 10,
+              cornerSmoothing: 0.6
+            ),
+          ),
+        ),
+        /*Stack(
+          for (row = 0; row < 5; row++)
+            for (col = 0; col < 7; col++)
+              count == 1 ?
+        ),*/
       ],
     );
   }
