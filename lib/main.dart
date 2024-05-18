@@ -14,9 +14,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ScreenUtil.init(context);
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
-    return const MaterialApp(
-      home: MainPage(),
+    return MaterialApp(
+      theme: ThemeData(
+        appBarTheme: const AppBarTheme(
+          systemOverlayStyle: SystemUiOverlayStyle.dark,
+        ),
+      ),
+      home: const MainPage(),
     );
   }
 }
