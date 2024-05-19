@@ -29,7 +29,7 @@ class MainPage extends StatelessWidget {
       appBar: const TopMenu(),
       body: Stack(
         children: <Widget>[
-          CalendarUi(),
+          const CalendarUi(),
           Align(
             alignment: Alignment.bottomRight,
             child: Padding(
@@ -53,13 +53,35 @@ class MainPage extends StatelessWidget {
   }
 }
 
-class CalendarUi extends StatelessWidget {
+class CalendarUi extends StatefulWidget {
+  const CalendarUi({super.key});
+
+  @override
+  CalendarUiState createState() => CalendarUiState();
+}
+
+class CalendarUiState extends State<CalendarUi> {
   final PageController _controller = PageController(
       initialPage:
-      (DateTime.now().year - 1970) * 12 + DateTime.now().month - 1);
+          (DateTime.now().year - 1970) * 12 + DateTime.now().month - 1);
   final List<String> _weekList = ['일', '월', '화', '수', '목', '금', '토'];
+  final ValueNotifier<int> _currentPage = ValueNotifier<int>(
+      (DateTime.now().year - 1970) * 12 + DateTime.now().month - 1);
 
-  CalendarUi({super.key});
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(() {
+      _currentPage.value = _controller.page!.round();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _currentPage.dispose();
+    super.dispose();
+  }
 
   int _getWeekCount(int y, int m) {
     return (DateTime(y, m, 1).weekday + DateTime(y, m + 1, 0).day) ~/ 7 + 1;
@@ -82,8 +104,8 @@ class CalendarUi extends StatelessWidget {
               color: index % 7 == 0
                   ? Color.fromRGBO(238, 75, 43, t)
                   : index % 7 == 6
-                  ? Color.fromRGBO(0, 150, 255, t)
-                  : Color.fromRGBO(0, 0, 0, t),
+                      ? Color.fromRGBO(0, 150, 255, t)
+                      : Color.fromRGBO(0, 0, 0, t),
             ),
           ),
         ),
@@ -102,7 +124,7 @@ class CalendarUi extends StatelessWidget {
             Wrap(
               children: List.generate(
                 _getWeekCount(year, month) * 7,
-                    (index) {
+                (index) {
                   int week = _getWeekCount(year, month);
                   double w = 1.sw / 7.0;
                   double h = (0.78.sh - 2 * (week - 1)) / week;
@@ -137,13 +159,13 @@ class CalendarUi extends StatelessWidget {
             Wrap(
               children: List.generate(
                 _getWeekCount(year, month) - 1,
-                    (index) {
+                (index) {
                   return Column(
                     children: [
                       SizedBox(
                         height:
-                        (0.78.sh - 2 * (_getWeekCount(year, month) - 1)) /
-                            _getWeekCount(year, month),
+                            (0.78.sh - 2 * (_getWeekCount(year, month) - 1)) /
+                                _getWeekCount(year, month),
                       ),
                       Align(
                         alignment: Alignment.center,
@@ -175,31 +197,37 @@ class CalendarUi extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PageView.builder(
-      controller: _controller,
-      itemBuilder: (_, index) {
-        return Column(
-          children: <Widget>[
-            SizedBox(
-              height: 0.05.sh,
-            ),
-            Text(
-              (1970 + index ~/ 12) == DateTime.now().year
-                  ? "${index % 12 + 1}"
-                  : "${1970 + index ~/ 12}.${index % 12 + 1}",
-              style: const TextStyle(
-                fontWeight: FontWeight.w900,
-                fontSize: 32,
-              ),
-            ),
-            SizedBox(
-              height: 0.005.sh,
-            ),
-            Row(
-              children: _weekList
-                  .asMap()
-                  .map(
-                    (index, day) => MapEntry(
+    return Column(
+      children: <Widget>[
+        SizedBox(
+          height: 0.05.sh,
+        ),
+        ValueListenableBuilder<int>(
+          valueListenable: _currentPage,
+          builder: (context, page, child) {
+            int year = 1970 + page ~/ 12;
+            int month = page % 12 + 1;
+            return Column(
+              children: <Widget>[
+                Text(
+                  year == DateTime.now().year ? "$month" : "$year.$month",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 32,
+                  ),
+                ),
+                SizedBox(
+                  height: 0.005.sh,
+                ),
+              ],
+            );
+          },
+        ),
+        Row(
+          children: _weekList
+              .asMap()
+              .map(
+                (index, day) => MapEntry(
                   index,
                   Flexible(
                     child: Container(
@@ -215,34 +243,35 @@ class CalendarUi extends StatelessWidget {
                           color: index == 0
                               ? const Color.fromRGBO(238, 75, 43, 1)
                               : index == 6
-                              ? const Color.fromRGBO(0, 150, 255, 1)
-                              : Colors.black,
+                                  ? const Color.fromRGBO(0, 150, 255, 1)
+                                  : Colors.black,
                         ),
                       ),
                     ),
                   ),
                 ),
               )
-                  .values
-                  .toList(),
-            ),
-            Container(
-              width: 0.99.sw,
-              height: 1,
-              decoration: BoxDecoration(
-                color: const Color.fromRGBO(229, 229, 229, 1),
-                borderRadius:
+              .values
+              .toList(),
+        ),
+        Container(
+          width: 0.99.sw,
+          height: 1,
+          decoration: BoxDecoration(
+            color: const Color.fromRGBO(229, 229, 229, 1),
+            borderRadius:
                 SmoothBorderRadius(cornerRadius: 10, cornerSmoothing: 0.6),
-              ),
-            ),
-            _calenderPrint(1970 + index ~/ 12, index % 12 + 1),
-          ],
-        );
-      },
+          ),
+        ),
+        Expanded(
+          child: PageView.builder(
+            controller: _controller,
+            itemBuilder: (_, index) {
+              return _calenderPrint(1970 + index ~/ 12, index % 12 + 1);
+            },
+          ),
+        ),
+      ],
     );
   }
 }
-/*
-Center(
-child: Text("${1970 + index ~/ 12}년 ${index % 12 + 1}월"),
-);*/
