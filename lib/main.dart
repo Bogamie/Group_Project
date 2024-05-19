@@ -1,6 +1,5 @@
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:group_project_calendar/reuse_element.dart';
 
@@ -14,13 +13,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ScreenUtil.init(context);
-    return MaterialApp(
-      theme: ThemeData(
-        appBarTheme: const AppBarTheme(
-          systemOverlayStyle: SystemUiOverlayStyle.dark,
-        ),
-      ),
-      home: const MainPage(),
+    return const MaterialApp(
+      home: MainPage(),
     );
   }
 }
@@ -31,54 +25,44 @@ class MainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: const TopMenu(),
       body: Stack(
         children: <Widget>[
-          TopMenu(),
-          CalendarFull(),
+          CalendarUi(),
           Align(
             alignment: Alignment.bottomRight,
             child: Padding(
-              padding: EdgeInsets.only(bottom: 16, right: 16),
+              padding: const EdgeInsets.only(bottom: 16, right: 16),
               child: FloatingActionButton(
-                onPressed: (){},
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
-                backgroundColor: Color.fromRGBO(77, 77, 77, 1),
+                onPressed: () {},
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(100)),
+                backgroundColor: const Color.fromRGBO(77, 77, 77, 1),
                 child: Icon(
                   Icons.add,
                   color: Colors.white,
                   size: 36.sp,
                 ),
               ),
-            )
-          )
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
-class CalendarFull extends StatefulWidget {
-  const CalendarFull({super.key});
-
-  @override
-  CalendarFullState createState() => CalendarFullState();
-}
-
-class CalendarFullState extends State<CalendarFull> {
+class CalendarUi extends StatelessWidget {
+  final PageController _controller = PageController(
+      initialPage:
+      (DateTime.now().year - 1970) * 12 + DateTime.now().month - 1);
   final List<String> _weekList = ['일', '월', '화', '수', '목', '금', '토'];
-  final int _year = 2024;
-  final int _month = 5;
 
-  @override
-  void initState() {
-    super.initState();
-  }
+  CalendarUi({super.key});
 
   int _getWeekCount(int y, int m) {
-    return (DateTime(_year, _month, 1).weekday +
-                DateTime(_year, _month + 1, 0).day) ~/
-            7 +
-        1;
+    return (DateTime(y, m, 1).weekday + DateTime(y, m + 1, 0).day) ~/ 7 + 1;
   }
 
   Column _getContainer(
@@ -98,8 +82,8 @@ class CalendarFullState extends State<CalendarFull> {
               color: index % 7 == 0
                   ? Color.fromRGBO(238, 75, 43, t)
                   : index % 7 == 6
-                      ? Color.fromRGBO(0, 150, 255, t)
-                      : Color.fromRGBO(0, 0, 0, t),
+                  ? Color.fromRGBO(0, 150, 255, t)
+                  : Color.fromRGBO(0, 0, 0, t),
             ),
           ),
         ),
@@ -110,79 +94,25 @@ class CalendarFullState extends State<CalendarFull> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Column _calenderPrint(int year, int month) {
     return Column(
       children: <Widget>[
-        SizedBox(
-          height: 0.05.sh,
-        ),
-        Text(
-          "$_month",
-          style: const TextStyle(
-            fontWeight: FontWeight.w900,
-            fontSize: 32,
-          ),
-        ),
-        SizedBox(
-          height: 0.005.sh,
-        ),
-        Row(
-          children: _weekList
-              .asMap()
-              .map(
-                (index, day) => MapEntry(
-                  index,
-                  Flexible(
-                    child: Container(
-                      height: 0.03.sh,
-                      padding: const EdgeInsets.only(top: 1, bottom: 1),
-                      color: Colors.transparent,
-                      alignment: Alignment.center,
-                      child: Text(
-                        day,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: index == 0
-                              ? const Color.fromRGBO(238, 75, 43, 1)
-                              : index == 6
-                                  ? const Color.fromRGBO(0, 150, 255, 1)
-                                  : Colors.black,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              )
-              .values
-              .toList(),
-        ),
-        Container(
-          width: 0.99.sw,
-          height: 1,
-          decoration: BoxDecoration(
-            color: const Color.fromRGBO(229, 229, 229, 1),
-            borderRadius:
-                SmoothBorderRadius(cornerRadius: 10, cornerSmoothing: 0.6),
-          ),
-        ),
         Stack(
           children: <Widget>[
             Wrap(
               children: List.generate(
-                _getWeekCount(_year, _month) * 7,
-                (index) {
-                  int week = _getWeekCount(_year, _month);
+                _getWeekCount(year, month) * 7,
+                    (index) {
+                  int week = _getWeekCount(year, month);
                   double w = 1.sw / 7.0;
-                  double h = 1.sh / (week + 1.5);
-                  int startDay = DateTime(_year, _month, 1).weekday;
-                  int dayOfMonth = DateTime(_year, _month + 1, 0).day;
+                  double h = (0.78.sh - 2 * (week - 1)) / week;
+                  int startDay = DateTime(year, month, 1).weekday;
+                  int dayOfMonth = DateTime(year, month + 1, 0).day;
 
                   if (index < startDay) {
                     return _getContainer(
                         index,
-                        DateTime(_year, _month, 0).day + index - startDay + 1,
+                        DateTime(year, month, 0).day + index - startDay + 1,
                         w,
                         h,
                         startDay,
@@ -206,12 +136,14 @@ class CalendarFullState extends State<CalendarFull> {
             ),
             Wrap(
               children: List.generate(
-                _getWeekCount(_year, _month) - 1,
-                (index) {
+                _getWeekCount(year, month) - 1,
+                    (index) {
                   return Column(
                     children: [
                       SizedBox(
-                        height: 1.sh / (_getWeekCount(_year, _month) + 1.5),
+                        height:
+                        (0.78.sh - 2 * (_getWeekCount(year, month) - 1)) /
+                            _getWeekCount(year, month),
                       ),
                       Align(
                         alignment: Alignment.center,
@@ -240,4 +172,77 @@ class CalendarFullState extends State<CalendarFull> {
       ],
     );
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return PageView.builder(
+      controller: _controller,
+      itemBuilder: (_, index) {
+        return Column(
+          children: <Widget>[
+            SizedBox(
+              height: 0.05.sh,
+            ),
+            Text(
+              (1970 + index ~/ 12) == DateTime.now().year
+                  ? "${index % 12 + 1}"
+                  : "${1970 + index ~/ 12}.${index % 12 + 1}",
+              style: const TextStyle(
+                fontWeight: FontWeight.w900,
+                fontSize: 32,
+              ),
+            ),
+            SizedBox(
+              height: 0.005.sh,
+            ),
+            Row(
+              children: _weekList
+                  .asMap()
+                  .map(
+                    (index, day) => MapEntry(
+                  index,
+                  Flexible(
+                    child: Container(
+                      height: 0.03.sh,
+                      padding: const EdgeInsets.only(top: 1, bottom: 1),
+                      color: Colors.transparent,
+                      alignment: Alignment.center,
+                      child: Text(
+                        day,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: index == 0
+                              ? const Color.fromRGBO(238, 75, 43, 1)
+                              : index == 6
+                              ? const Color.fromRGBO(0, 150, 255, 1)
+                              : Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              )
+                  .values
+                  .toList(),
+            ),
+            Container(
+              width: 0.99.sw,
+              height: 1,
+              decoration: BoxDecoration(
+                color: const Color.fromRGBO(229, 229, 229, 1),
+                borderRadius:
+                SmoothBorderRadius(cornerRadius: 10, cornerSmoothing: 0.6),
+              ),
+            ),
+            _calenderPrint(1970 + index ~/ 12, index % 12 + 1),
+          ],
+        );
+      },
+    );
+  }
 }
+/*
+Center(
+child: Text("${1970 + index ~/ 12}년 ${index % 12 + 1}월"),
+);*/
