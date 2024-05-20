@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:group_project_calendar/main.dart';
 
 // AppBar 상단 버튼
 class TopMenu extends StatelessWidget implements PreferredSizeWidget {
-  final CalendarUiState cus = CalendarUiState();
-  TopMenu({super.key});
+  final VoidCallback onMoveTo;
+  const TopMenu({super.key, required this.onMoveTo});
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0.0,
@@ -49,9 +48,7 @@ class TopMenu extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ),
               IconButton(
-                onPressed: (){
-                  cus.moveToCurrentDate();
-                },
+                onPressed: onMoveTo,
                 icon: SvgPicture.asset(
                   "assets/icons/today_date.svg",
                 ),
