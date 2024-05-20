@@ -26,7 +26,7 @@ class MainPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: const TopMenu(),
+      appBar: TopMenu(),
       body: Stack(
         children: <Widget>[
           const CalendarUi(),
@@ -61,9 +61,7 @@ class CalendarUi extends StatefulWidget {
 }
 
 class CalendarUiState extends State<CalendarUi> {
-  final PageController _controller = PageController(
-      initialPage:
-          (DateTime.now().year - 1970) * 12 + DateTime.now().month - 1);
+  late final PageController _controller;
   final List<String> _weekList = ['일', '월', '화', '수', '목', '금', '토'];
   final ValueNotifier<int> _currentPage = ValueNotifier<int>(
       (DateTime.now().year - 1970) * 12 + DateTime.now().month - 1);
@@ -71,6 +69,9 @@ class CalendarUiState extends State<CalendarUi> {
   @override
   void initState() {
     super.initState();
+    _controller = PageController(
+      initialPage: (DateTime.now().year - 1970) * 12 + DateTime.now().month - 1,
+    );
     _controller.addListener(() {
       _currentPage.value = _controller.page!.round();
     });
@@ -84,11 +85,35 @@ class CalendarUiState extends State<CalendarUi> {
   }
 
   int _getWeekCount(int y, int m) {
-    return (DateTime(y, m, 1).weekday + DateTime(y, m + 1, 0).day) ~/ 7 + 1;
+    // 월이 몇 주가 있는지 계산
+    int count = DateTime(y, m, 1).weekday % 7 + DateTime(y, m + 1, 0).day;
+    if (count % 7 == 0) {
+      return count ~/ 7;
+    } else {
+      return count ~/ 7 + 1;
+    }
+  }
+
+  void moveToCurrentDate() {
+    if (_controller.hasClients) {
+      _controller.jumpToPage(
+          (DateTime.now().year - 1970) * 12 + DateTime.now().month + 1);
+    } else {
+      _controller.jumpToPage(
+          (DateTime.now().year - 1970) * 12 + DateTime.now().month + 1);
+    }
+    // _currentPage.value = targetIndex;
   }
 
   Column _getContainer(
-      int index, int date, double w, double h, int sD, int doM, double t) {
+      // 날짜 한칸을 출력하는 메서드
+      int index,
+      int date,
+      double w,
+      double h,
+      int sD,
+      int doM,
+      double t) {
     return Column(
       children: [
         Container(
@@ -117,21 +142,23 @@ class CalendarUiState extends State<CalendarUi> {
   }
 
   Column _calenderPrint(int year, int month) {
+    // 달력 전체를 출력하는 메서드
     return Column(
       children: <Widget>[
         Stack(
           children: <Widget>[
             Wrap(
               children: List.generate(
+                // 날짜 출력
                 _getWeekCount(year, month) * 7,
                 (index) {
                   int week = _getWeekCount(year, month);
                   double w = 1.sw / 7.0;
                   double h = (0.78.sh - 2 * (week - 1)) / week;
-                  int startDay = DateTime(year, month, 1).weekday;
+                  int startDay = DateTime(year, month, 1).weekday % 7;
                   int dayOfMonth = DateTime(year, month + 1, 0).day;
 
-                  if (index < startDay) {
+                  if (index < startDay % 7) {
                     return _getContainer(
                         index,
                         DateTime(year, month, 0).day + index - startDay + 1,
@@ -150,13 +177,21 @@ class CalendarUiState extends State<CalendarUi> {
                         dayOfMonth,
                         0.2);
                   } else {
-                    return _getContainer(index, index - startDay + 1, w, h,
-                        startDay, dayOfMonth, 1.0);
+                    return _getContainer(
+                      index,
+                      index - startDay + 1,
+                      w,
+                      h,
+                      startDay,
+                      dayOfMonth,
+                      1.0,
+                    );
                   }
                 },
               ),
             ),
             Wrap(
+              // 라인 출력
               children: List.generate(
                 _getWeekCount(year, month) - 1,
                 (index) {
@@ -197,12 +232,14 @@ class CalendarUiState extends State<CalendarUi> {
 
   @override
   Widget build(BuildContext context) {
+    // 메인화면 출력
     return Column(
       children: <Widget>[
         SizedBox(
           height: 0.05.sh,
         ),
         ValueListenableBuilder<int>(
+          // 상단 년, 월 출력
           valueListenable: _currentPage,
           builder: (context, page, child) {
             int year = 1970 + page ~/ 12;
@@ -224,6 +261,7 @@ class CalendarUiState extends State<CalendarUi> {
           },
         ),
         Row(
+          // 주 출력
           children: _weekList
               .asMap()
               .map(

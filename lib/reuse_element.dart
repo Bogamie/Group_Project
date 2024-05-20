@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:group_project_calendar/main.dart';
 
 // AppBar 상단 버튼
 class TopMenu extends StatelessWidget implements PreferredSizeWidget {
-  const TopMenu({super.key});
+  final CalendarUiState cus = CalendarUiState();
+  TopMenu({super.key});
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -38,17 +40,17 @@ class TopMenu extends StatelessWidget implements PreferredSizeWidget {
           icon: Stack(
             alignment: Alignment.center,
             children: <Widget>[
-              const Positioned(
+              Positioned(
                 child: Text(
-                  "19",
-                  style: TextStyle(
+                  "${DateTime.now().day}",
+                  style: const TextStyle(
                     letterSpacing: -1,
                   ),
                 ),
               ),
               IconButton(
-                onPressed: () {
-                  // 현재 날짜로 이동
+                onPressed: (){
+                  cus.moveToCurrentDate();
                 },
                 icon: SvgPicture.asset(
                   "assets/icons/today_date.svg",
