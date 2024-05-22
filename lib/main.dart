@@ -105,8 +105,8 @@ class MainPageState extends State<MainPage> {
           child: Column(
             children: <Widget>[
               Container(
-                height: height / 6.85,
-                width: height / 6.85,
+                height: 1.sh / 42,
+                width: 1.sh / 42,
                 decoration: BoxDecoration(
                   color: color,
                   borderRadius: SmoothBorderRadius(
