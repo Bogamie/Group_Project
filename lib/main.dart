@@ -85,7 +85,7 @@ class MainPageState extends State<MainPage> {
   // 월이 몇 주가 있는지 계산
   int _getWeekCount(int y, int m) {
     int count = DateTime(y, m, 1).weekday % 7 + DateTime(y, m + 1, 0).day;
-    return count % 7 == 0 ? count ~/ 7 : count ~/ 7 + 1;
+    return (count % 7 == 0) && (count ~/ 7 != 4 ) ? count ~/ 7 : count ~/ 7 + 1;
   }
 
   Widget _buildDayContainer({
