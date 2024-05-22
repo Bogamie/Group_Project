@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:group_project_calendar/calender.dart';
 import 'package:group_project_calendar/reuse_element.dart';
 import 'package:provider/provider.dart';
 
@@ -48,11 +49,9 @@ class MainPage extends StatefulWidget {
 
 class MainPageState extends State<MainPage> {
   final PageController _controller = PageController(
-      initialPage:
-          (DateTime.now().year - 1970) * 12 + DateTime.now().month - 1);
+    initialPage: (DateTime.now().year - 1970) * 12 + DateTime.now().month - 1,
+  );
   final List<String> _weekList = ['일', '월', '화', '수', '목', '금', '토'];
-  final ValueNotifier<int> _currentPage = ValueNotifier<int>(
-      (DateTime.now().year - 1970) * 12 + DateTime.now().month - 1);
 
   @override
   void initState() {
@@ -68,7 +67,6 @@ class MainPageState extends State<MainPage> {
   @override
   void dispose() {
     _controller.dispose();
-    _currentPage.dispose();
     super.dispose();
   }
 
@@ -87,11 +85,55 @@ class MainPageState extends State<MainPage> {
   // 월이 몇 주가 있는지 계산
   int _getWeekCount(int y, int m) {
     int count = DateTime(y, m, 1).weekday % 7 + DateTime(y, m + 1, 0).day;
-    if (count % 7 == 0) {
-      return count ~/ 7;
-    } else {
-      return count ~/ 7 + 1;
-    }
+    return count % 7 == 0 ? count ~/ 7 : count ~/ 7 + 1;
+  }
+
+  Widget _buildDayContainer({
+    required double width,
+    required double height,
+    required String text,
+    Color color = Colors.transparent,
+    Color textColor = Colors.black,
+  }) {
+    return Column(
+      children: <Widget>[
+        Container(
+          color: Colors.transparent,
+          width: width,
+          height: height,
+          alignment: Alignment.topCenter,
+          child: Column(
+            children: <Widget>[
+              Container(
+                height: height / 6.85,
+                width: height / 6.85,
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: SmoothBorderRadius(
+                    cornerRadius: 5,
+                    cornerSmoothing: 0.6,
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    text,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: textColor,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(
+          height: 2,
+        )
+      ],
+    );
   }
 
   @override
@@ -168,15 +210,14 @@ class MainPageState extends State<MainPage> {
                 decoration: BoxDecoration(
                   color: const Color.fromRGBO(229, 229, 229, 1),
                   borderRadius: SmoothBorderRadius(
-                      cornerRadius: 10, cornerSmoothing: 0.6),
+                    cornerRadius: 10,
+                    cornerSmoothing: 0.6,
+                  ),
                 ),
               ),
-
               Expanded(child: Consumer<PageNotifier>(
                 builder: (context, notifier, child) {
                   int page = notifier.currentPage;
-                  int pYear = 1970 + page ~/ 12;
-                  int pMonth = page % 12 + 1;
                   return PageView.builder(
                     controller: _controller,
                     itemBuilder: (_, index) {
@@ -198,162 +239,63 @@ class MainPageState extends State<MainPage> {
                                         DateTime(year, month, 1).weekday % 7;
                                     int dayOfMonth =
                                         DateTime(year, month + 1, 0).day;
-                                    DateTime pDate =
-                                        DateTime(pYear, pMonth, page);
                                     if (index < startDay % 7) {
                                       return GestureDetector(
                                         onTap: () => animatePage(page - 1),
-                                        child: Column(
-                                          children: <Widget>[
-                                            Container(
-                                              color: Colors.transparent,
-                                              width: w,
-                                              height: h,
-                                              alignment: Alignment.topCenter,
-                                              child: Column(
-                                                children: <Widget>[
-                                                  Container(
-                                                    color: pDate ==
-                                                            DateTime.now()
-                                                        ? Colors.red
-                                                        : Colors.transparent,
-                                                    child: Text(
-                                                      "${DateTime(year, month, 0).day + index - startDay + 1}",
-                                                      style: TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: index % 7 == 0
-                                                            ? const Color
-                                                                .fromRGBO(238,
-                                                                75, 43, 0.2)
-                                                            : index % 7 == 6
-                                                                ? const Color
-                                                                    .fromRGBO(
-                                                                    0,
-                                                                    150,
-                                                                    255,
-                                                                    0.2)
-                                                                : const Color
-                                                                    .fromRGBO(0,
-                                                                    0, 0, 0.2),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Expanded(
-                                                    child: Container(
-                                                      color: Colors.transparent,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              height: 2,
-                                            ),
-                                          ],
+                                        child: _buildDayContainer(
+                                          width: w,
+                                          height: h,
+                                          text:
+                                              "${DateTime(year, month, 0).day + index - startDay + 1}",
+                                          textColor: index % 7 == 0
+                                              ? const Color.fromRGBO(
+                                                  238, 75, 43, 0.2)
+                                              : index % 7 == 6
+                                                  ? const Color.fromRGBO(
+                                                      0, 150, 255, 0.2)
+                                                  : const Color.fromRGBO(
+                                                      0, 0, 0, 0.2),
                                         ),
                                       );
                                     } else if (index >= dayOfMonth + startDay) {
                                       return GestureDetector(
                                         onTap: () => animatePage(page + 1),
-                                        child: Column(
-                                          children: <Widget>[
-                                            Container(
-                                              color: Colors.transparent,
-                                              width: w,
-                                              height: h,
-                                              alignment: Alignment.topCenter,
-                                              child: Column(
-                                                children: <Widget>[
-                                                  Container(
-                                                    color: pDate ==
-                                                            DateTime.now()
-                                                        ? Colors.red
-                                                        : Colors.transparent,
-                                                    child: Text(
-                                                      "${index - startDay - dayOfMonth + 1}",
-                                                      style: TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: index % 7 == 0
-                                                            ? const Color
-                                                                .fromRGBO(238,
-                                                                75, 43, 0.2)
-                                                            : index % 7 == 6
-                                                                ? const Color
-                                                                    .fromRGBO(
-                                                                    0,
-                                                                    150,
-                                                                    255,
-                                                                    0.2)
-                                                                : const Color
-                                                                    .fromRGBO(0,
-                                                                    0, 0, 0.2),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Expanded(
-                                                    child: Container(
-                                                      color: Colors.transparent,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              height: 2,
-                                            ),
-                                          ],
+                                        child: _buildDayContainer(
+                                          width: w,
+                                          height: h,
+                                          text:
+                                              "${index - startDay - dayOfMonth + 1}",
+                                          textColor: index % 7 == 0
+                                              ? const Color.fromRGBO(
+                                                  238, 75, 43, 0.2)
+                                              : index % 7 == 6
+                                                  ? const Color.fromRGBO(
+                                                      0, 150, 255, 0.2)
+                                                  : const Color.fromRGBO(
+                                                      0, 0, 0, 0.2),
                                         ),
                                       );
                                     } else {
-                                      return Column(
-                                        children: <Widget>[
-                                          Container(
-                                            color: Colors.transparent,
-                                            width: w,
-                                            height: h,
-                                            alignment: Alignment.topCenter,
-                                            child: Column(
-                                              children: <Widget>[
-                                                Container(
-                                                  color: pDate == DateTime.now()
-                                                      ? Colors.red
-                                                      : Colors.transparent,
-                                                  child: Text(
-                                                    "${index - startDay + 1}",
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: index % 7 == 0
-                                                          ? const Color
-                                                              .fromRGBO(
-                                                              238, 75, 43, 1)
-                                                          : index % 7 == 6
-                                                              ? const Color
-                                                                  .fromRGBO(0,
-                                                                  150, 255, 1)
-                                                              : const Color
-                                                                  .fromRGBO(
-                                                                  0, 0, 0, 1),
-                                                    ),
-                                                  ),
-                                                ),
-                                                Expanded(
-                                                  child: Container(
-                                                    color: Colors.transparent,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          const SizedBox(
-                                            height: 2,
-                                          ),
-                                        ],
+                                      Calendar c = Calendar(
+                                          year: year,
+                                          month: month,
+                                          day: index - startDay + 1);
+                                      return _buildDayContainer(
+                                        width: w,
+                                        height: h,
+                                        text: "${index - startDay + 1}",
+                                        color: c.isToday
+                                            ? const Color.fromRGBO(
+                                                255, 49, 49, 0.4)
+                                            : Colors.transparent,
+                                        textColor: index % 7 == 0
+                                            ? const Color.fromRGBO(
+                                                238, 75, 43, 1)
+                                            : index % 7 == 6
+                                                ? const Color.fromRGBO(
+                                                    0, 150, 255, 1)
+                                                : const Color.fromRGBO(
+                                                    0, 0, 0, 1),
                                       );
                                     }
                                   },
