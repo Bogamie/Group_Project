@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 // AppBar 상단 버튼
 class TopMenu extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onMoveTo;
+
   const TopMenu({super.key, required this.onMoveTo});
 
   @override
@@ -14,50 +16,88 @@ class TopMenu extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0.0,
-      leading: IconButton(
-        padding: const EdgeInsets.only(left: 2.0),
-        onPressed: () {
-          // 사이드 바 확장
+      leading: GestureDetector(
+        onTap: () {
+          // 메뉴바 확장
         },
-        icon: SvgPicture.asset(
-          "assets/icons/menu.svg",
+        child: Container(
+          width: 40,
+          height: 40,
+          decoration: const BoxDecoration(
+            color: Colors.transparent,
+            shape: BoxShape.circle,
+          ),
+          child: Center(
+            child: SizedBox(
+              width: 22,
+              height: 22,
+              child: SvgPicture.asset(
+                "assets/icons/menu.svg",
+              ),
+            ),
+          ),
         ),
       ),
       actions: <Widget>[
-        IconButton(
-          visualDensity: const VisualDensity(horizontal: -4.0, vertical: 0.0),
-          onPressed: () {
-            // 찾기
+        GestureDetector(
+          onTap: () {
+            // 검색 기능
           },
-          icon: SvgPicture.asset(
-            "assets/icons/search.svg",
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: const BoxDecoration(
+              color: Colors.transparent,
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: SizedBox(
+                width: 22,
+                height: 22,
+                child: SvgPicture.asset(
+                  "assets/icons/search.svg",
+                ),
+              ),
+            ),
           ),
         ),
-        IconButton(
-          padding: const EdgeInsets.all(0.0),
-          onPressed: () {},
-          icon: Stack(
-            alignment: Alignment.center,
-            children: <Widget>[
-              Positioned(
+        GestureDetector(
+          onTap: onMoveTo,
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: const BoxDecoration(
+              color: Colors.transparent,
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Container(
+                width: 25,
+                height: 25,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: SmoothBorderRadius(
+                    cornerRadius: 7,
+                    cornerSmoothing: 0.6,
+                  ),
+                  border: Border.all(
+                    color: Colors.black,
+                    width: 1.5,
+                  ),
+                ),
                 child: Text(
                   "${DateTime.now().day}",
                   style: const TextStyle(
-                    letterSpacing: -1,
+                    letterSpacing: -0.2,
                   ),
                 ),
               ),
-              IconButton(
-                onPressed: onMoveTo,
-                icon: SvgPicture.asset(
-                  "assets/icons/today_date.svg",
-                ),
-              ),
-            ],
+            ),
           ),
         ),
         const SizedBox(
-          width: 10,
+          width: 15,
         ),
       ],
     );
