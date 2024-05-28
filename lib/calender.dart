@@ -20,3 +20,13 @@ class Calendar {
     return today.year == year && today.month == month && today.day == day;
   }
 }
+
+class CalendarEvent {
+  final DateTime date;
+  final String event;
+
+  const CalendarEvent({
+    required this.date,
+    required this.event,
+  });
+}

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:group_project_calendar/calender.dart';
 import 'package:group_project_calendar/reuse_element.dart';
 import 'package:provider/provider.dart';
@@ -10,6 +11,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => PageNotifier()),
+        ChangeNotifierProvider(create: (_) => FabNotifier()),
       ],
       child: const MyApp(),
     ),
@@ -36,6 +38,17 @@ class PageNotifier extends ChangeNotifier {
 
   void updatePage(int page) {
     _currentPage = page;
+    notifyListeners();
+  }
+}
+
+class FabNotifier extends ChangeNotifier {
+  bool _open = false;
+
+  bool get isOpen => _open;
+
+  void toggle() {
+    _open = !_open;
     notifyListeners();
   }
 }
@@ -70,7 +83,7 @@ class MainPageState extends State<MainPage> {
     super.dispose();
   }
 
-  void animatePage(int page) {
+  void _animatePage(int page) {
     _controller.animateToPage(
       page,
       curve: Curves.easeInOut,
@@ -78,14 +91,14 @@ class MainPageState extends State<MainPage> {
     );
   }
 
-  void jumpPage(int page) {
+  void _jumpPage(int page) {
     _controller.jumpToPage(page);
   }
 
   // 월이 몇 주가 있는지 계산
   int _getWeekCount(int y, int m) {
     int count = DateTime(y, m, 1).weekday % 7 + DateTime(y, m + 1, 0).day;
-    return (count % 7 == 0) && (count ~/ 7 != 4 ) ? count ~/ 7 : count ~/ 7 + 1;
+    return (count % 7 == 0) && (count ~/ 7 != 4) ? count ~/ 7 : count ~/ 7 + 1;
   }
 
   Widget _buildDayContainer({
@@ -141,7 +154,7 @@ class MainPageState extends State<MainPage> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: TopMenu(
-        onMoveTo: () => jumpPage(
+        onMoveTo: () => _jumpPage(
             (DateTime.now().year - 1970) * 12 + DateTime.now().month - 1),
       ),
       body: Stack(
@@ -241,7 +254,7 @@ class MainPageState extends State<MainPage> {
                                         DateTime(year, month + 1, 0).day;
                                     if (index < startDay % 7) {
                                       return GestureDetector(
-                                        onTap: () => animatePage(page - 1),
+                                        onTap: () => _animatePage(page - 1),
                                         child: _buildDayContainer(
                                           width: w,
                                           height: h,
@@ -259,7 +272,7 @@ class MainPageState extends State<MainPage> {
                                       );
                                     } else if (index >= dayOfMonth + startDay) {
                                       return GestureDetector(
-                                        onTap: () => animatePage(page + 1),
+                                        onTap: () => _animatePage(page + 1),
                                         child: _buildDayContainer(
                                           width: w,
                                           height: h,
@@ -353,16 +366,30 @@ class MainPageState extends State<MainPage> {
             alignment: Alignment.bottomRight,
             child: Padding(
               padding: const EdgeInsets.only(bottom: 16, right: 16),
-              child: FloatingActionButton(
-                onPressed: () {},
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(100)),
-                backgroundColor: const Color.fromRGBO(77, 77, 77, 1),
-                child: Icon(
-                  Icons.add,
+              child: SpeedDial(
+                icon: Icons.add_rounded,
+                activeIcon: Icons.close_rounded,
+                // 클릭 후 아이콘
+                iconTheme: const IconThemeData(
                   color: Colors.white,
-                  size: 36.sp,
                 ),
+                overlayOpacity: 0.0,
+                spaceBetweenChildren: 10,
+                backgroundColor: const Color.fromRGBO(77, 77, 77, 1),
+                childrenButtonSize: Size.fromRadius(30),
+                direction: SpeedDialDirection.up,
+                children: [
+                  SpeedDialChild(
+                    child: const Icon(Icons.event_rounded),
+                    label: '이벤트',
+                    shape: const CircleBorder(),
+                  ),
+                  SpeedDialChild(
+                    child: const Icon(Icons.event_available_rounded),
+                    label: '할일',
+                    shape: const CircleBorder(),
+                  ),
+                ],
               ),
             ),
           ),
