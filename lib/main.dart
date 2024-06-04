@@ -16,8 +16,6 @@ class MyApp extends StatelessWidget {
 
 class HomeScreen extends StatelessWidget {
   void _showOverlay(BuildContext context) {
-    double customHeight = 800.0; // 원하는 높이로 설정
-
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -26,6 +24,7 @@ class HomeScreen extends StatelessWidget {
       transitionDuration: const Duration(milliseconds: 200),
       pageBuilder: (BuildContext buildContext, Animation animation, Animation secondaryAnimation) {
         double width = MediaQuery.of(context).size.width * 0.90; // 화면 너비의 90%
+        double height = MediaQuery.of(context).size.height * 0.90; // 화면 높이의 90%
         double statusBarHeight = MediaQuery.of(context).padding.top; // 상태바 높이
 
         return StatefulBuilder(
@@ -43,7 +42,7 @@ class HomeScreen extends StatelessWidget {
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       width: width,
-                      height: customHeight - viewInsets,
+                      height: height - viewInsets,
                       color: Colors.white, // 전체 오버레이의 배경색을 흰색으로 설정
                       child: Column(
                         children: [
@@ -60,7 +59,7 @@ class HomeScreen extends StatelessWidget {
                                         TextField(
                                           decoration: InputDecoration(
                                             hintText: '제목',
-                                            hintStyle: TextStyle(color: Colors.grey, fontSize: 20.0), // 제목 텍스트 크기 변경
+                                            hintStyle: TextStyle(color: Colors.grey, fontSize: 18.0), // 제목 텍스트 크기 변경
                                             contentPadding: EdgeInsets.only(left: 10.0), // 오른쪽으로 이동
                                             enabledBorder: UnderlineInputBorder(
                                               borderSide: BorderSide(color: Colors.grey),
