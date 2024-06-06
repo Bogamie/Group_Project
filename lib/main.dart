@@ -14,7 +14,14 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  Color _fabColor = Colors.grey;
+
   void _showOverlay(BuildContext context) {
     showGeneralDialog(
       context: context,
@@ -22,7 +29,7 @@ class HomeScreen extends StatelessWidget {
       barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
       barrierColor: Colors.black45,
       transitionDuration: const Duration(milliseconds: 200),
-      pageBuilder: (BuildContext buildContext, Animation animation, Animation secondaryAnimation) {
+      pageBuilder: (BuildContext buildContext, Animation<double> animation, Animation<double> secondaryAnimation) {
         double width = MediaQuery.of(context).size.width * 0.90; // 화면 너비의 90%
         double height = MediaQuery.of(context).size.height * 0.90; // 화면 높이의 90%
         double statusBarHeight = MediaQuery.of(context).padding.top; // 상태바 높이
@@ -70,18 +77,19 @@ class HomeScreen extends StatelessWidget {
                                           ),
                                         ),
                                         Positioned(
-                                          right: 10, // 왼쪽으로 약간 이동
-                                          top: 25, // 버튼의 위치를 약간 아래로 내림
+                                          right: 10, // 오른쪽으로 약간 이동
+                                          top: 10, // 상단으로 약간 이동
                                           child: GestureDetector(
                                             onTap: () {
                                               // 나중에 색상 선택 오버레이 구현
+                                              _showColorPickerOverlay(context);
                                             },
                                             child: Container(
-                                              width: 17,
-                                              height: 17,
+                                              width: 20, // 작은 원형 버튼 크기
+                                              height: 20, // 작은 원형 버튼 크기
                                               decoration: BoxDecoration(
+                                                color: _fabColor,
                                                 shape: BoxShape.circle,
-                                                color: Colors.grey, // 기본 색상 설정
                                               ),
                                             ),
                                           ),
@@ -117,132 +125,137 @@ class HomeScreen extends StatelessWidget {
                                       ),
                                     ),
                                     SizedBox(height: 10), // 요소 간의 간격
-                                    Row(
+                                    Stack(
                                       children: [
-                                        SvgPicture.asset(
-                                          'assets/icons/category.svg', // SVG 파일 경로
-                                          color: Colors.black, // 아이콘 색상을 검은색으로 설정
-                                          width: 24,
-                                          height: 24,
-                                        ),
-                                        SizedBox(width: 5), // 간격을 줄임
-                                        Expanded(
-                                          child: TextField(
-                                            decoration: InputDecoration(
-                                              hintText: '카테고리',
-                                              hintStyle: TextStyle(color: Colors.grey, fontSize: 16.0), // 텍스트 크기 변경
-                                              contentPadding: EdgeInsets.only(left: 10.0), // 오른쪽으로 이동
-                                              enabledBorder: UnderlineInputBorder(
-                                                borderSide: BorderSide(color: Colors.grey),
-                                              ),
-                                              focusedBorder: UnderlineInputBorder(
-                                                borderSide: BorderSide(color: Colors.grey),
-                                              ),
+                                        TextField(
+                                          decoration: InputDecoration(
+                                            hintText: '카테고리',
+                                            hintStyle: TextStyle(color: Colors.grey, fontSize: 16.0), // 텍스트 크기 변경
+                                            contentPadding: EdgeInsets.only(left: 40.0), // 오른쪽으로 이동
+                                            enabledBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(color: Colors.grey),
                                             ),
+                                            focusedBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(color: Colors.grey),
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          left: 5, // 오른쪽으로 이동
+                                          top: 10, // 아이콘의 위치를 적절히 조정
+                                          child: SvgPicture.asset(
+                                            'assets/icons/category.svg', // SVG 파일 경로
+                                            color: Colors.black, // 아이콘 색상을 검은색으로 설정
+                                            width: 24,
+                                            height: 24,
                                           ),
                                         ),
                                       ],
                                     ),
                                     SizedBox(height: 10), // 요소 간의 간격
-                                    Row(
+                                    Stack(
                                       children: [
-                                        SvgPicture.asset(
-                                          'assets/icons/alarm.svg', // SVG 파일 경로
-                                          color: Colors.black, // 아이콘 색상을 검은색으로 설정
-                                          width: 24,
-                                          height: 24,
-                                        ),
-                                        SizedBox(width: 5), // 간격을 줄임
-                                        Expanded(
-                                          child: TextField(
-                                            decoration: InputDecoration(
-                                              hintText: '알림',
-                                              hintStyle: TextStyle(color: Colors.grey, fontSize: 16.0), // 텍스트 크기 변경
-                                              contentPadding: EdgeInsets.only(left: 10.0), // 오른쪽으로 이동
-                                              enabledBorder: UnderlineInputBorder(
-                                                borderSide: BorderSide(color: Colors.grey),
-                                              ),
-                                              focusedBorder: UnderlineInputBorder(
-                                                borderSide: BorderSide(color: Colors.grey),
-                                              ),
+                                        TextField(
+                                          decoration: InputDecoration(
+                                            hintText: '알림',
+                                            hintStyle: TextStyle(color: Colors.grey, fontSize: 16.0), // 텍스트 크기 변경
+                                            contentPadding: EdgeInsets.only(left: 40.0), // 오른쪽으로 이동
+                                            enabledBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(color: Colors.grey),
                                             ),
+                                            focusedBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(color: Colors.grey),
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          left: 5, // 오른쪽으로 이동
+                                          top: 10, // 아이콘의 위치를 적절히 조정
+                                          child: SvgPicture.asset(
+                                            'assets/icons/alarm.svg', // SVG 파일 경로
+                                            color: Colors.black, // 아이콘 색상을 검은색으로 설정
+                                            width: 24,
+                                            height: 24,
                                           ),
                                         ),
                                       ],
                                     ),
                                     SizedBox(height: 10), // 요소 간의 간격
-                                    Row(
+                                    Stack(
                                       children: [
-                                        SvgPicture.asset(
-                                          'assets/icons/repeat.svg', // SVG 파일 경로
-                                          color: Colors.black, // 아이콘 색상을 검은색으로 설정
-                                          width: 24,
-                                          height: 24,
-                                        ),
-                                        SizedBox(width: 5), // 간격을 줄임
-                                        Expanded(
-                                          child: TextField(
-                                            decoration: InputDecoration(
-                                              hintText: '반복',
-                                              hintStyle: TextStyle(color: Colors.grey, fontSize: 16.0), // 텍스트 크기 변경
-                                              contentPadding: EdgeInsets.only(left: 10.0), // 오른쪽으로 이동
-                                              enabledBorder: UnderlineInputBorder(
-                                                borderSide: BorderSide(color: Colors.grey),
-                                              ),
-                                              focusedBorder: UnderlineInputBorder(
-                                                borderSide: BorderSide(color: Colors.grey),
-                                              ),
+                                        TextField(
+                                          decoration: InputDecoration(
+                                            hintText: '반복',
+                                            hintStyle: TextStyle(color: Colors.grey, fontSize: 16.0), // 텍스트 크기 변경
+                                            contentPadding: EdgeInsets.only(left: 40.0), // 오른쪽으로 이동
+                                            enabledBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(color: Colors.grey),
                                             ),
+                                            focusedBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(color: Colors.grey),
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          left: 5, // 오른쪽으로 이동
+                                          top: 10, // 아이콘의 위치를 적절히 조정
+                                          child: SvgPicture.asset(
+                                            'assets/icons/repeat.svg', // SVG 파일 경로
+                                            color: Colors.black, // 아이콘 색상을 검은색으로 설정
+                                            width: 24,
+                                            height: 24,
                                           ),
                                         ),
                                       ],
                                     ),
                                     SizedBox(height: 10), // 요소 간의 간격
-                                    Row(
+                                    Stack(
                                       children: [
-                                        SvgPicture.asset(
-                                          'assets/icons/place.svg', // SVG 파일 경로
-                                          color: Colors.black, // 아이콘 색상을 검은색으로 설정
-                                          width: 24,
-                                          height: 24,
-                                        ),
-                                        SizedBox(width: 5), // 간격을 줄임
-                                        Expanded(
-                                          child: TextField(
-                                            decoration: InputDecoration(
-                                              hintText: '장소',
-                                              hintStyle: TextStyle(color: Colors.grey, fontSize: 16.0), // 텍스트 크기 변경
-                                              contentPadding: EdgeInsets.only(left: 10.0), // 오른쪽으로 이동
-                                              enabledBorder: UnderlineInputBorder(
-                                                borderSide: BorderSide(color: Colors.grey),
-                                              ),
-                                              focusedBorder: UnderlineInputBorder(
-                                                borderSide: BorderSide(color: Colors.grey),
-                                              ),
+                                        TextField(
+                                          decoration: InputDecoration(
+                                            hintText: '장소',
+                                            hintStyle: TextStyle(color: Colors.grey, fontSize: 16.0), // 텍스트 크기 변경
+                                            contentPadding: EdgeInsets.only(left: 40.0), // 오른쪽으로 이동
+                                            enabledBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(color: Colors.grey),
                                             ),
+                                            focusedBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(color: Colors.grey),
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          left: 5, // 오른쪽으로 이동
+                                          top: 10, // 아이콘의 위치를 적절히 조정
+                                          child: SvgPicture.asset(
+                                            'assets/icons/place.svg', // SVG 파일 경로
+                                            color: Colors.black, // 아이콘 색상을 검은색으로 설정
+                                            width: 24,
+                                            height: 24,
                                           ),
                                         ),
                                       ],
                                     ),
                                     SizedBox(height: 10), // 요소 간의 간격
-                                    Row(
+                                    Stack(
                                       children: [
-                                        SvgPicture.asset(
-                                          'assets/icons/memo.svg', // SVG 파일 경로
-                                          color: Colors.black, // 아이콘 색상을 검은색으로 설정
-                                          width: 24,
-                                          height: 24,
+                                        TextField(
+                                          decoration: InputDecoration(
+                                            hintText: '메모',
+                                            hintStyle: TextStyle(color: Colors.grey, fontSize: 16.0), // 텍스트 크기 변경
+                                            contentPadding: EdgeInsets.only(left: 40.0), // 오른쪽으로 이동
+                                            enabledBorder: InputBorder.none,
+                                            focusedBorder: InputBorder.none,
+                                          ),
                                         ),
-                                        SizedBox(width: 5), // 간격을 줄임
-                                        Expanded(
-                                          child: TextField(
-                                            decoration: InputDecoration(
-                                              hintText: '메모',
-                                              hintStyle: TextStyle(color: Colors.grey, fontSize: 16.0), // 텍스트 크기 변경
-                                              contentPadding: EdgeInsets.only(left: 10.0), // 오른쪽으로 이동
-                                              enabledBorder: InputBorder.none,
-                                              focusedBorder: InputBorder.none,
-                                            ),
+                                        Positioned(
+                                          left: 5, // 오른쪽으로 이동
+                                          top: 10, // 아이콘의 위치를 적절히 조정
+                                          child: SvgPicture.asset(
+                                            'assets/icons/memo.svg', // SVG 파일 경로
+                                            color: Colors.black, // 아이콘 색상을 검은색으로 설정
+                                            width: 24,
+                                            height: 24,
                                           ),
                                         ),
                                       ],
@@ -300,6 +313,51 @@ class HomeScreen extends StatelessWidget {
           },
         );
       },
+    );
+  }
+
+  void _showColorPickerOverlay(BuildContext context) {
+    // 색상 선택 오버레이를 표시하는 코드 추가
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Container(
+          height: 200,
+          child: GridView.count(
+            crossAxisCount: 5,
+            children: [
+              _buildColorOption(context, Colors.red),
+              _buildColorOption(context, Colors.green),
+              _buildColorOption(context, Colors.blue),
+              _buildColorOption(context, Colors.yellow),
+              _buildColorOption(context, Colors.orange),
+              _buildColorOption(context, Colors.purple),
+              _buildColorOption(context, Colors.pink),
+              _buildColorOption(context, Colors.brown),
+              _buildColorOption(context, Colors.cyan),
+              _buildColorOption(context, Colors.lime),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildColorOption(BuildContext context, Color color) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _fabColor = color;
+        });
+        Navigator.pop(context);
+      },
+      child: Container(
+        margin: EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+          color: color,
+          shape: BoxShape.circle,
+        ),
+      ),
     );
   }
 
