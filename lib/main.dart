@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:figma_squircle/figma_squircle.dart';
+import 'package:flutter_date_pickers/flutter_date_pickers.dart' as dp;
 
 void main() {
   runApp(MyApp());
@@ -21,6 +23,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Color _fabColor = Colors.grey;
+  DateTime _firstDate = DateTime.now().subtract(Duration(days: 30));
+  DateTime _lastDate = DateTime.now().add(Duration(days: 30));
+  dp.DatePeriod _selectedPeriod = dp.DatePeriod(DateTime.now().subtract(Duration(days: 5)), DateTime.now().add(Duration(days: 5)));
 
   void _showOverlay(BuildContext context) {
     showGeneralDialog(
@@ -42,10 +47,12 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: EdgeInsets.only(top: statusBarHeight),
               child: Align(
                 alignment: Alignment.topCenter,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20.0), // 원하는 곡률로 설정
+                child: ClipSmoothRect(
+                  radius: SmoothBorderRadius(
+                    cornerRadius: 20,
+                    cornerSmoothing: 0.6,
+                  ),
                   child: Material(
-                    borderRadius: BorderRadius.circular(20.0),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       width: width,
@@ -60,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    SizedBox(height: 40.0), // 제목과 상단의 간격을 아래로 내림
+                                    SizedBox(height: 20.0), // 제목과 상단의 간격을 아래로 내림
                                     Stack(
                                       children: [
                                         TextField(
@@ -96,35 +103,102 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                       ],
                                     ),
-                                    SizedBox(height: 5), // 제목과 시작 사이의 간격 조정
-                                    Container(
-                                      alignment: Alignment.centerLeft, // 왼쪽 정렬
-                                      padding: EdgeInsets.only(left: 10.0, top: 10.0, bottom: 10.0), // 패딩 조정
-                                      child: Text(
-                                        '시작',
-                                        style: TextStyle(fontSize: 16.0, color: Colors.black), // 시작 텍스트 크기 변경
-                                      ),
-                                    ),
-                                    SizedBox(height: 10), // 시작과 종료 사이의 간격을 줄임
-                                    Container(
-                                      padding: EdgeInsets.only(left: 10.0, right: 5.0, top: 10.0, bottom: 10.0), // 패딩 조정
-                                      decoration: BoxDecoration(
-                                        border: Border(
-                                          bottom: BorderSide(color: Colors.grey), // 언더라인 추가
-                                        ),
-                                      ),
-                                      child: Row(
+                                    SizedBox(height: 0), // 제목과 시작 사이의 간격 조정
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 10.0), // 전체를 아래로 내림
+                                      child: Column(
                                         children: [
-                                          Expanded(
-                                            child: Text(
-                                              '종료',
-                                              style: TextStyle(fontSize: 16.0, color: Colors.black), // 종료 텍스트 크기 변경
-                                            ),
+                                          Row(
+                                            children: [
+                                              Container(
+                                                alignment: Alignment.centerLeft, // 왼쪽 정렬
+                                                padding: EdgeInsets.only(left: 10.0, top: 10.0, bottom: 10.0), // 패딩 조정
+                                                child: Text(
+                                                  '시작',
+                                                  style: TextStyle(fontSize: 16.0, color: Colors.black), // 시작 텍스트 크기 변경
+                                                ),
+                                              ),
+                                              SizedBox(width: 10),
+                                              Container(
+                                                height: 40, // 버튼 높이 줄이기
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  border: Border.all(color: Colors.black),
+                                                  borderRadius: BorderRadius.all(Radius.circular(4)), // 곡률을 줄여 사각형에 가깝게 설정
+                                                ),
+                                                child: ElevatedButton(
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor: Colors.white, // 배경색 흰색
+                                                    foregroundColor: Colors.black, // 텍스트 색상 검은색
+                                                    shadowColor: Colors.transparent,
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(4), // 곡률을 줄여 사각형에 가깝게 설정
+                                                    ),
+                                                    elevation: 0, // 그림자 제거
+                                                  ),
+                                                  onPressed: () => _showDatePicker(context, true),
+                                                  child: Text(
+                                                    '${_selectedPeriod.start.toLocal()}'.split(' ')[0],
+                                                    style: TextStyle(fontSize: 16.0, color: Colors.black),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 0), // 시작과 종료 사이의 간격을 줄임
+                                          Stack(
+                                            children: [
+                                              Container(
+                                                padding: EdgeInsets.only(left: 10.0, right: 5.0, top: 35.0, bottom: 15.0), // 패딩 조정
+                                                decoration: BoxDecoration(
+                                                  border: Border(
+                                                    bottom: BorderSide(color: Colors.grey), // 언더라인 추가
+                                                  ),
+                                                ),
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Container(
+                                                    alignment: Alignment.centerLeft, // 왼쪽 정렬
+                                                    padding: EdgeInsets.only(left: 10.0, top: 10.0, bottom: 10.0), // 패딩 조정
+                                                    child: Text(
+                                                      '종료',
+                                                      style: TextStyle(fontSize: 16.0, color: Colors.black), // 종료 텍스트 크기 변경
+                                                    ),
+                                                  ),
+                                                  SizedBox(width: 10),
+                                                  Container(
+                                                    height: 40, // 버튼 높이 줄이기
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      border: Border.all(color: Colors.black),
+                                                      borderRadius: BorderRadius.all(Radius.circular(4)), // 곡률을 줄여 사각형에 가깝게 설정
+                                                    ),
+                                                    child: ElevatedButton(
+                                                      style: ElevatedButton.styleFrom(
+                                                        backgroundColor: Colors.white, // 배경색 흰색
+                                                        foregroundColor: Colors.black, // 텍스트 색상 검은색
+                                                        shadowColor: Colors.transparent,
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.circular(4), // 곡률을 줄여 사각형에 가깝게 설정
+                                                        ),
+                                                        elevation: 0, // 그림자 제거
+                                                      ),
+                                                      onPressed: () => _showDatePicker(context, false),
+                                                      child: Text(
+                                                        '${_selectedPeriod.end.toLocal()}'.split(' ')[0],
+                                                        style: TextStyle(fontSize: 16.0, color: Colors.black),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
                                     ),
-                                    SizedBox(height: 10), // 요소 간의 간격
+                                    SizedBox(height: 5), // 요소 간의 간격
                                     Stack(
                                       children: [
                                         TextField(
@@ -152,7 +226,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                       ],
                                     ),
-                                    SizedBox(height: 10), // 요소 간의 간격
+                                    SizedBox(height: 5), // 요소 간의 간격
                                     Stack(
                                       children: [
                                         TextField(
@@ -180,7 +254,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                       ],
                                     ),
-                                    SizedBox(height: 10), // 요소 간의 간격
+                                    SizedBox(height: 5), // 요소 간의 간격
                                     Stack(
                                       children: [
                                         TextField(
@@ -208,7 +282,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                       ],
                                     ),
-                                    SizedBox(height: 10), // 요소 간의 간격
+                                    SizedBox(height: 5), // 요소 간의 간격
                                     Stack(
                                       children: [
                                         TextField(
@@ -236,7 +310,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                       ],
                                     ),
-                                    SizedBox(height: 10), // 요소 간의 간격
+                                    SizedBox(height: 5), // 요소 간의 간격
                                     Stack(
                                       children: [
                                         TextField(
@@ -260,7 +334,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                       ],
                                     ),
-                                    SizedBox(height: 20), // 마지막 요소와 하단 버튼 사이의 간격
+                                    SizedBox(height: 10), // 마지막 요소와 하단 버튼 사이의 간격
                                   ],
                                 ),
                               ),
@@ -278,14 +352,21 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center, // 중앙 정렬
                               children: [
-                                Spacer(), // 좌측 여백을 위한 Spacer
+                                SizedBox(width: 10), // 좌측 여백을 위한 SizedBox
                                 ElevatedButton(
                                   onPressed: () {
                                     Navigator.pop(context);
                                   },
-                                  child: Text('취소'),
+                                  child: Text(
+                                    '취소',
+                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18), // 텍스트 볼드체 및 크기 증가
+                                  ),
                                   style: ElevatedButton.styleFrom(
-                                    minimumSize: Size(100, 40), // 버튼 크기 조정
+                                    backgroundColor: Colors.white, // 배경색 흰색
+                                    foregroundColor: Colors.black, // 텍스트 색상 검은색
+                                    shadowColor: Colors.transparent,
+                                    minimumSize: Size(150, 40), // 버튼 크기 조정
+                                    elevation: 0, // 그림자 제거
                                   ),
                                 ),
                                 SizedBox(width: 20), // 버튼 사이 여백
@@ -294,12 +375,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                     // 이벤트 저장 로직 추가
                                     Navigator.pop(context);
                                   },
-                                  child: Text('저장'),
+                                  child: Text(
+                                    '저장',
+                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18), // 텍스트 볼드체 및 크기 증가
+                                  ),
                                   style: ElevatedButton.styleFrom(
-                                    minimumSize: Size(100, 40), // 버튼 크기 조정
+                                    backgroundColor: Colors.white, // 배경색 흰색
+                                    foregroundColor: Colors.black, // 텍스트 색상 검은색
+                                    shadowColor: Colors.transparent,
+                                    minimumSize: Size(150, 40), // 버튼 크기 조정
+                                    elevation: 0, // 그림자 제거
                                   ),
                                 ),
-                                Spacer(), // 우측 여백을 위한 Spacer
+                                SizedBox(width: 10), // 우측 여백을 위한 SizedBox
                               ],
                             ),
                           ),
@@ -311,6 +399,49 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             );
           },
+        );
+      },
+    );
+  }
+
+  void _showDatePicker(BuildContext context, bool isStart) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 400,
+          padding: EdgeInsets.all(16.0),
+          child: dp.RangePicker(
+            selectedPeriod: _selectedPeriod,
+            onChanged: (dp.DatePeriod newPeriod) {
+              setState(() {
+                _selectedPeriod = newPeriod;
+              });
+              Navigator.pop(context); // 날짜 선택 후 오버레이 닫기
+            },
+            firstDate: _firstDate,
+            lastDate: _lastDate,
+            datePickerStyles: dp.DatePickerRangeStyles(
+              selectedPeriodLastDecoration: BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(10.0),
+                  bottomRight: Radius.circular(10.0),
+                ),
+              ),
+              selectedPeriodStartDecoration: BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(10.0),
+                  bottomLeft: Radius.circular(10.0),
+                ),
+              ),
+              selectedPeriodMiddleDecoration: BoxDecoration(
+                color: Colors.blue.withOpacity(0.5),
+                shape: BoxShape.rectangle,
+              ),
+            ),
+          ),
         );
       },
     );
