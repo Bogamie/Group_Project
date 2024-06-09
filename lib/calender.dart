@@ -2,18 +2,14 @@ class Calendar {
   final int year;
   final int month;
   final int day;
-  final bool isSelect;
+  bool isSelect;
 
-  const Calendar({
+  Calendar({
     required this.year,
     required this.month,
     required this.day,
     this.isSelect = false,
   });
-
-  bool get isSelected {
-    return isSelect;
-  }
 
   bool get isToday {
     DateTime today = DateTime.now();

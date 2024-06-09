@@ -12,6 +12,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => PageNotifier()),
         ChangeNotifierProvider(create: (_) => FabNotifier()),
+        ChangeNotifierProvider(create: (_) => SelectNotifier()),
       ],
       child: const MyApp(),
     ),
@@ -52,6 +53,24 @@ class FabNotifier extends ChangeNotifier {
     notifyListeners();
   }
 }
+
+class SelectNotifier extends ChangeNotifier {
+  int _selectedDay = DateTime.now().day;
+  Calendar? _selectedCal;
+
+  int get selectedDay => _selectedDay;
+
+  void selectDay(Calendar cal) {
+    if (_selectedCal != null) {
+      _selectedCal!.isSelect = false;
+    }
+    _selectedCal = cal;
+    _selectedDay = cal.day;
+    _selectedCal!.isSelect = true;
+    notifyListeners();
+  }
+}
+
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -95,6 +114,14 @@ class MainPageState extends State<MainPage> {
     _controller.jumpToPage(page);
   }
 
+  Color _getColor(int index, double opac) {
+    return index % 7 == 0
+        ? Color.fromRGBO(238, 75, 43, opac)
+        : index % 7 == 6
+            ? Color.fromRGBO(0, 150, 255, opac)
+            : Color.fromRGBO(0, 0, 0, opac);
+  }
+
   // 월이 몇 주가 있는지 계산
   int _getWeekCount(int y, int m) {
     int count = DateTime(y, m, 1).weekday % 7 + DateTime(y, m + 1, 0).day;
@@ -105,21 +132,31 @@ class MainPageState extends State<MainPage> {
     required double width,
     required double height,
     required String text,
+    Color borderColor = Colors.transparent,
     Color color = Colors.transparent,
     Color textColor = Colors.black,
   }) {
     return Column(
       children: <Widget>[
         Container(
-          color: Colors.transparent,
+          // color: Colors.transparent,
           width: width,
           height: height,
           alignment: Alignment.topCenter,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: borderColor,
+            ),
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: 5,
+              cornerSmoothing: 0.6,
+            ),
+          ),
           child: Column(
             children: <Widget>[
               Container(
                 height: 1.sh / 42,
-                width: 1.sh / 42,
+                width: 1.sh / 42 * 2,
                 decoration: BoxDecoration(
                   color: color,
                   borderRadius: SmoothBorderRadius(
@@ -203,11 +240,7 @@ class MainPageState extends State<MainPage> {
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
-                                color: index == 0
-                                    ? const Color.fromRGBO(238, 75, 43, 1)
-                                    : index == 6
-                                        ? const Color.fromRGBO(0, 150, 255, 1)
-                                        : Colors.black,
+                                color: _getColor(index, 1),
                               ),
                             ),
                           ),
@@ -260,55 +293,49 @@ class MainPageState extends State<MainPage> {
                                           height: h,
                                           text:
                                               "${DateTime(year, month, 0).day + index - startDay + 1}",
-                                          textColor: index % 7 == 0
-                                              ? const Color.fromRGBO(
-                                                  238, 75, 43, 0.2)
-                                              : index % 7 == 6
-                                                  ? const Color.fromRGBO(
-                                                      0, 150, 255, 0.2)
-                                                  : const Color.fromRGBO(
-                                                      0, 0, 0, 0.2),
+                                          textColor: _getColor(index, 0.2),
                                         ),
                                       );
                                     } else if (index >= dayOfMonth + startDay) {
                                       return GestureDetector(
                                         onTap: () => _animatePage(page + 1),
                                         child: _buildDayContainer(
-                                          width: w,
-                                          height: h,
-                                          text:
-                                              "${index - startDay - dayOfMonth + 1}",
-                                          textColor: index % 7 == 0
-                                              ? const Color.fromRGBO(
-                                                  238, 75, 43, 0.2)
-                                              : index % 7 == 6
-                                                  ? const Color.fromRGBO(
-                                                      0, 150, 255, 0.2)
-                                                  : const Color.fromRGBO(
-                                                      0, 0, 0, 0.2),
-                                        ),
+                                            width: w,
+                                            height: h,
+                                            text:
+                                                "${index - startDay - dayOfMonth + 1}",
+                                            textColor: _getColor(index, 0.2)),
                                       );
                                     } else {
-                                      Calendar c = Calendar(
-                                          year: year,
-                                          month: month,
-                                          day: index - startDay + 1);
-                                      return _buildDayContainer(
-                                        width: w,
-                                        height: h,
-                                        text: "${index - startDay + 1}",
-                                        color: c.isToday
-                                            ? const Color.fromRGBO(
-                                                255, 49, 49, 0.4)
-                                            : Colors.transparent,
-                                        textColor: index % 7 == 0
-                                            ? const Color.fromRGBO(
-                                                238, 75, 43, 1)
-                                            : index % 7 == 6
-                                                ? const Color.fromRGBO(
-                                                    0, 150, 255, 1)
-                                                : const Color.fromRGBO(
-                                                    0, 0, 0, 1),
+                                      Calendar cal = Calendar(
+                                        year: year,
+                                        month: month,
+                                        day: index - startDay + 1,
+                                      );
+                                      return GestureDetector(
+                                        onTap: () {
+                                          Provider.of<SelectNotifier>(context,
+                                                  listen: false)
+                                              .selectDay(cal);
+                                        },
+                                        child: Consumer<SelectNotifier>(
+                                          builder: (context, selection, child) {
+                                            return _buildDayContainer(
+                                              width: w,
+                                              height: h,
+                                              text: "${index - startDay + 1}",
+                                              borderColor: cal.isSelect
+                                                  ? const Color.fromRGBO(
+                                                      170, 170, 170, 1)
+                                                  : Colors.transparent,
+                                              color: cal.isToday
+                                                  ? const Color.fromRGBO(
+                                                      255, 49, 49, 0.4)
+                                                  : Colors.transparent,
+                                              textColor: _getColor(index, 1.0),
+                                            );
+                                          },
+                                        ),
                                       );
                                     }
                                   },
@@ -376,7 +403,7 @@ class MainPageState extends State<MainPage> {
                 overlayOpacity: 0.0,
                 spaceBetweenChildren: 10,
                 backgroundColor: const Color.fromRGBO(77, 77, 77, 1),
-                childrenButtonSize: Size.fromRadius(30),
+                childrenButtonSize: const Size.fromRadius(30),
                 direction: SpeedDialDirection.up,
                 children: [
                   SpeedDialChild(
