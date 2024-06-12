@@ -92,4 +92,3 @@ From now on, the reuse_element file will contain frequently used elements.
 &nbsp;&nbsp;When you finished writing messages, close editor screen and push them.
 ```
 git push
-```
