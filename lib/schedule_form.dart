@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_date_pickers/flutter_date_pickers.dart' as dp;
+import 'package:intl/intl.dart'; // intl 패키지 import
 
 class ScheduleForm extends StatefulWidget {
   final Color fabColor;
@@ -26,8 +27,13 @@ class ScheduleForm extends StatefulWidget {
 class _ScheduleFormState extends State<ScheduleForm> {
   bool _isEndDateEnabled = false;
 
-  double _startTextSpacing = 10.0;  // 시작 텍스트와 날짜 위젯 간의 간격
-  double _endTextSpacing = 10.0;    // 종료 텍스트와 날짜 위젯 간의 간격
+  String _formatDate(DateTime date) {
+    final DateFormat formatter = DateFormat('yyyy년 M월 d일');
+    return formatter.format(date);
+  }
+
+  double _endTextToCheckboxSpacing = 0.0; // 종료 텍스트와 체크박스 사이의 거리
+  double _checkboxToEndDateSpacing = 0.0; // 체크박스와 날짜 위젯 사이의 거리
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +67,6 @@ class _ScheduleFormState extends State<ScheduleForm> {
                         top: 10, // 상단으로 약간 이동
                         child: GestureDetector(
                           onTap: () {
-                            // 나중에 색상 선택 오버레이 구현
                             _showColorPickerOverlay(context);
                           },
                           child: Container(
@@ -91,9 +96,10 @@ class _ScheduleFormState extends State<ScheduleForm> {
                                 style: TextStyle(fontSize: 16.0, color: Colors.black), // 시작 텍스트 크기 변경
                               ),
                             ),
-                            SizedBox(width: 48), // 시작 텍스트와 날짜 위젯 사이 거리 조정
+                            SizedBox(width: 48), // 시작 텍스트와 날짜 위젯 사이의 거리
                             Container(
                               height: 40, // 버튼 높이 줄이기
+                              width: 170, // 버튼 너비 고정
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 border: Border.all(color: Colors.black),
@@ -111,7 +117,7 @@ class _ScheduleFormState extends State<ScheduleForm> {
                                 ),
                                 onPressed: () => _showDatePicker(context, true),
                                 child: Text(
-                                  '${widget.selectedPeriod.start.toLocal()}'.split(' ')[0],
+                                  _formatDate(widget.selectedPeriod.start), // 날짜 형식 변경
                                   style: TextStyle(fontSize: 16.0, color: Colors.black),
                                 ),
                               ),
@@ -130,7 +136,7 @@ class _ScheduleFormState extends State<ScheduleForm> {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 0.0), // 텍스트와 체크박스 사이 간격을 줄임
+                              padding: EdgeInsets.symmetric(horizontal: _endTextToCheckboxSpacing), // 텍스트와 체크박스 사이의 간격
                               child: Checkbox(
                                 value: _isEndDateEnabled,
                                 onChanged: (bool? value) {
@@ -140,32 +146,34 @@ class _ScheduleFormState extends State<ScheduleForm> {
                                 },
                               ),
                             ),
-                            SizedBox(width: 0), // 종료 텍스트와 날짜 위젯 사이 거리 조정
-                            Container(
-                              height: 40, // 버튼 높이 줄이기
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(color: Colors.black),
-                                borderRadius: BorderRadius.all(Radius.circular(4)), // 곡률을 줄여 사각형에 가깝게 설정
-                              ),
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white, // 배경색 흰색
-                                  foregroundColor: Colors.black, // 텍스트 색상 검은색
-                                  shadowColor: Colors.transparent,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(4), // 곡률을 줄여 사각형에 가깝게 설정
-                                  ),
-                                  elevation: 0, // 그림자 제거
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: _checkboxToEndDateSpacing), // 체크박스와 날짜 위젯 사이의 간격
+                              child: Container(
+                                height: 40, // 버튼 높이 줄이기
+                                width: 170, // 버튼 너비 고정
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(color: Colors.black),
+                                  borderRadius: BorderRadius.all(Radius.circular(4)), // 곡률을 줄여 사각형에 가깝게 설정
                                 ),
-                                onPressed: _isEndDateEnabled
-                                    ? () => _showDatePicker(context, false)
-                                    : null,
-                                child: Text(
-                                  '${widget.selectedPeriod.end.toLocal()}'.split(' ')[0],
-                                  style: TextStyle(
-                                    fontSize: 16.0,
-                                    color: _isEndDateEnabled ? Colors.black : Colors.grey,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white, // 배경색 흰색
+                                    foregroundColor: Colors.black, // 텍스트 색상 검은색
+                                    shadowColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(4)), // 곡률을 줄여 사각형에 가깝게 설정
+                                    elevation: 0, // 그림자 제거
+                                  ),
+                                  onPressed: _isEndDateEnabled
+                                      ? () => _showDatePicker(context, false)
+                                      : null,
+                                  child: Text(
+                                    _formatDate(widget.selectedPeriod.end), // 날짜 형식 변경
+                                    style: TextStyle(
+                                      fontSize: 16.0,
+                                      color: _isEndDateEnabled ? Colors.black : Colors.grey,
+                                    ),
                                   ),
                                 ),
                               ),
