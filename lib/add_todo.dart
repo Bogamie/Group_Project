@@ -181,10 +181,8 @@ class AddTodoOverlayState extends State<AddTodoOverlay> {
                               children: [
                                 Container(
                                   alignment: Alignment.centerLeft,
-                                  // 왼쪽 정렬
                                   padding: const EdgeInsets.only(
                                       left: 10.0, top: 10.0, bottom: 10.0),
-                                  // 패딩 조정
                                   child: const Text(
                                     '시작',
                                     style: TextStyle(
@@ -198,9 +196,10 @@ class AddTodoOverlayState extends State<AddTodoOverlay> {
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     border: Border.all(color: Colors.black),
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(
-                                            4)), // 곡률을 줄여 사각형에 가깝게 설정
+                                    borderRadius: SmoothBorderRadius(
+                                      cornerRadius: 6,
+                                      cornerSmoothing: 0.6,
+                                    ),
                                   ),
                                   child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
@@ -210,8 +209,10 @@ class AddTodoOverlayState extends State<AddTodoOverlay> {
                                       // 텍스트 색상 검은색
                                       shadowColor: Colors.transparent,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                            4), // 곡률을 줄여 사각형에 가깝게 설정
+                                        borderRadius: SmoothBorderRadius(
+                                          cornerRadius: 6,
+                                          cornerSmoothing: 0.6,
+                                        ),
                                       ),
                                       elevation: 0, // 그림자 제거
                                     ),
@@ -266,9 +267,10 @@ class AddTodoOverlayState extends State<AddTodoOverlay> {
                                       decoration: BoxDecoration(
                                         color: Colors.white,
                                         border: Border.all(color: Colors.black),
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(
-                                                4)), // 곡률을 줄여 사각형에 가깝게 설정
+                                        borderRadius: SmoothBorderRadius(
+                                          cornerRadius: 6,
+                                          cornerSmoothing: 0.6,
+                                        ),
                                       ),
                                       child: ElevatedButton(
                                         style: ElevatedButton.styleFrom(
@@ -278,8 +280,10 @@ class AddTodoOverlayState extends State<AddTodoOverlay> {
                                           // 텍스트 색상 검은색
                                           shadowColor: Colors.transparent,
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                                4), // 곡률을 줄여 사각형에 가깝게 설정
+                                            borderRadius: SmoothBorderRadius(
+                                              cornerRadius: 6,
+                                              cornerSmoothing: 0.6,
+                                            ),
                                           ),
 
                                           elevation: 0, // 그림자 제거
@@ -340,9 +344,7 @@ class AddTodoOverlayState extends State<AddTodoOverlay> {
                               hintText: '메모',
                               hintStyle:
                               TextStyle(color: Colors.grey, fontSize: 16.0),
-                              // 텍스트 크기 변경
                               contentPadding: EdgeInsets.only(left: 40.0),
-                              // 오른쪽으로 이동
                               enabledBorder: InputBorder.none,
                               focusedBorder: InputBorder.none,
                             ),
@@ -370,7 +372,7 @@ class AddTodoOverlayState extends State<AddTodoOverlay> {
               margin: const EdgeInsets.symmetric(
                   horizontal: 15.0), // 스크롤 영역의 언더라인과 같은 길이로 설정
             ),
-            Container(
+            SizedBox(
               height: 50.0, // 고정된 영역의 높이 설정
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center, // 중앙 정렬

@@ -199,9 +199,10 @@ class AddEventOverlayState extends State<AddEventOverlay> {
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     border: Border.all(color: Colors.black),
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(
-                                            4)), // 곡률을 줄여 사각형에 가깝게 설정
+                                    borderRadius: SmoothBorderRadius(
+                                      cornerRadius: 6,
+                                      cornerSmoothing: 0.6,
+                                    ), // 곡률을 줄여 사각형에 가깝게 설정
                                   ),
                                   child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
@@ -211,8 +212,10 @@ class AddEventOverlayState extends State<AddEventOverlay> {
                                       // 텍스트 색상 검은색
                                       shadowColor: Colors.transparent,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                            4), // 곡률을 줄여 사각형에 가깝게 설정
+                                        borderRadius: SmoothBorderRadius(
+                                          cornerRadius: 6,
+                                          cornerSmoothing: 0.6,
+                                        ),
                                       ),
                                       elevation: 0, // 그림자 제거
                                     ),
@@ -267,9 +270,10 @@ class AddEventOverlayState extends State<AddEventOverlay> {
                                       decoration: BoxDecoration(
                                         color: Colors.white,
                                         border: Border.all(color: Colors.black),
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(
-                                                4)), // 곡률을 줄여 사각형에 가깝게 설정
+                                        borderRadius: SmoothBorderRadius(
+                                          cornerRadius: 6,
+                                          cornerSmoothing: 0.6,
+                                        ),
                                       ),
                                       child: ElevatedButton(
                                         style: ElevatedButton.styleFrom(
@@ -279,8 +283,10 @@ class AddEventOverlayState extends State<AddEventOverlay> {
                                           // 텍스트 색상 검은색
                                           shadowColor: Colors.transparent,
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                                4), // 곡률을 줄여 사각형에 가깝게 설정
+                                            borderRadius: SmoothBorderRadius(
+                                              cornerRadius: 6,
+                                              cornerSmoothing: 0.6,
+                                            ),
                                           ),
 
                                           elevation: 0, // 그림자 제거
