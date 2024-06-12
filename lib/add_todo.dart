@@ -3,10 +3,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter_date_pickers/flutter_date_pickers.dart' as dp;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 
 class AddTodoOverlay extends StatefulWidget {
   const AddTodoOverlay({super.key});
 
+  @override
   AddTodoOverlayState createState() => AddTodoOverlayState();
 }
 
@@ -17,6 +19,21 @@ class AddTodoOverlayState extends State<AddTodoOverlay> {
   dp.DatePeriod _selectedPeriod = dp.DatePeriod(
       DateTime.now().subtract(const Duration(days: 5)),
       DateTime.now().add(const Duration(days: 5)));
+  bool _isEndDateEnabled = false;
+  TimeOfDay _startTime = TimeOfDay.now();
+  TimeOfDay _endTime = TimeOfDay.now();
+
+  String _formatDate(DateTime date) {
+    final DateFormat formatter = DateFormat('yyyy년 M월 d일');
+    return formatter.format(date);
+  }
+
+  String _formatTime(TimeOfDay time) {
+    final now = DateTime.now();
+    final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+    final format = DateFormat.Hm(); // 24시간 형식
+    return format.format(dt);
+  }
 
   void _showDatePicker(BuildContext context, bool isStart) {
     showModalBottomSheet(
@@ -59,6 +76,23 @@ class AddTodoOverlayState extends State<AddTodoOverlay> {
         );
       },
     );
+  }
+
+  void _showTimePicker(BuildContext context, bool isStart) {
+    showTimePicker(
+      context: context,
+      initialTime: isStart ? _startTime : _endTime,
+    ).then((pickedTime) {
+      if (pickedTime != null) {
+        setState(() {
+          if (isStart) {
+            _startTime = pickedTime;
+          } else {
+            _endTime = pickedTime;
+          }
+        });
+      }
+    });
   }
 
   void _showColorPickerOverlay(BuildContext context) {
@@ -139,8 +173,7 @@ class AddTodoOverlayState extends State<AddTodoOverlay> {
                           const TextField(
                             decoration: InputDecoration(
                               hintText: '제목',
-                              hintStyle:
-                              TextStyle(color: Colors.grey, fontSize: 18.0),
+                              hintStyle: TextStyle(color: Colors.grey, fontSize: 18.0),
                               // 제목 텍스트 크기 변경
                               contentPadding: EdgeInsets.only(left: 10.0),
                               // 오른쪽으로 이동
@@ -157,7 +190,6 @@ class AddTodoOverlayState extends State<AddTodoOverlay> {
                             top: 10, // 상단으로 약간 이동
                             child: GestureDetector(
                               onTap: () {
-                                // 나중에 색상 선택 오버레이 구현
                                 _showColorPickerOverlay(context);
                               },
                               child: Container(
@@ -172,139 +204,173 @@ class AddTodoOverlayState extends State<AddTodoOverlay> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 0), // 제목과 시작 사이의 간격 조정
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10.0), // 전체를 아래로 내림
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  alignment: Alignment.centerLeft,
-                                  padding: const EdgeInsets.only(
-                                      left: 10.0, top: 10.0, bottom: 10.0),
-                                  child: const Text(
-                                    '시작',
-                                    style: TextStyle(
-                                        fontSize: 16.0,
-                                        color: Colors.black), // 시작 텍스트 크기 변경
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Container(
-                                  height: 40, // 버튼 높이 줄이기
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    border: Border.all(color: Colors.black),
-                                    borderRadius: SmoothBorderRadius(
-                                      cornerRadius: 6,
-                                      cornerSmoothing: 0.6,
-                                    ),
-                                  ),
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.white,
-                                      // 배경색 흰색
-                                      foregroundColor: Colors.black,
-                                      // 텍스트 색상 검은색
-                                      shadowColor: Colors.transparent,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: SmoothBorderRadius(
-                                          cornerRadius: 6,
-                                          cornerSmoothing: 0.6,
-                                        ),
-                                      ),
-                                      elevation: 0, // 그림자 제거
-                                    ),
-                                    onPressed: () =>
-                                        _showDatePicker(context, true),
+                      const SizedBox(height: 10), // 제목과 시작 사이의 간격 조정
+                      Column(
+                        children: [
+                          Stack(
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    alignment: Alignment.centerLeft, // 왼쪽 정렬
+                                    padding: const EdgeInsets.only(left: 10.0, top: 10.0, bottom: 10.0), // 패딩 조정
                                     child: Text(
-                                      '${_selectedPeriod.start.toLocal()}'
-                                          .split(' ')[0],
-                                      style: const TextStyle(
-                                          fontSize: 16.0, color: Colors.black),
+                                      '시작',
+                                      style: TextStyle(fontSize: 16.0, color: Colors.black), // 시작 텍스트 크기 변경
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 0), // 시작과 종료 사이의 간격을 줄임
-                            Stack(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.only(
-                                      left: 10.0,
-                                      right: 5.0,
-                                      top: 35.0,
-                                      bottom: 15.0),
-                                  // 패딩 조정
-                                  decoration: const BoxDecoration(
-                                    border: Border(
-                                      bottom: BorderSide(
-                                          color: Colors.grey), // 언더라인 추가
+                                  SizedBox(width: 48),
+                                  Container(
+                                    height: 40, // 버튼 높이 줄이기
+                                    width: 145, // 시작 날짜 선택 버튼 너비 고정
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      border: Border.all(color: Colors.black),
+                                      borderRadius: BorderRadius.all(Radius.circular(4)), // 곡률을 줄여 사각형에 가깝게 설정
                                     ),
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    Container(
-                                      alignment: Alignment.centerLeft, // 왼쪽 정렬
-                                      padding: const EdgeInsets.only(
-                                          left: 10.0,
-                                          top: 10.0,
-                                          bottom: 10.0), // 패딩 조정
-                                      child: const Text(
-                                        '종료',
-                                        style: TextStyle(
-                                            fontSize: 16.0,
-                                            color:
-                                            Colors.black), // 종료 텍스트 크기 변경
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white, // 배경색 흰색
+                                        foregroundColor: Colors.black, // 텍스트 색상 검은색
+                                        shadowColor: Colors.transparent,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(4), // 곡률을 줄여 사각형에 가깝게 설정
+                                        ),
+                                        elevation: 0, // 그림자 제거
+                                      ),
+                                      onPressed: () => _showDatePicker(context, true),
+                                      child: Text(
+                                        _formatDate(_selectedPeriod.start), // 날짜 형식 변경
+                                        style: TextStyle(fontSize: 16.0, color: Colors.black),
                                       ),
                                     ),
-                                    const SizedBox(width: 10),
-                                    Container(
+                                  ),
+                                  SizedBox(width: 2), // 날짜와 시간 위젯 사이의 간격
+                                  Container(
+                                    height: 40,
+                                    width: 70, // 시작 시간 선택 너비를 줄임
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      border: Border.all(color: Colors.black),
+                                      borderRadius: BorderRadius.all(Radius.circular(4)),
+                                    ),
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: Colors.black,
+                                        shadowColor: Colors.transparent,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        elevation: 0,
+                                      ),
+                                      onPressed: () => _showTimePicker(context, true),
+                                      child: Text(
+                                        _formatTime(_startTime),
+                                        style: TextStyle(fontSize: 13.0, color: Colors.black), // 텍스트 크기 조정
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 0), // 시작과 종료 사이의 간격을 줄임
+                          Stack(
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    alignment: Alignment.centerLeft, // 왼쪽 정렬
+                                    padding: const EdgeInsets.only(left: 10.0, top: 10.0, bottom: 10.0), // 패딩 조정
+                                    child: Text(
+                                      '종료',
+                                      style: TextStyle(fontSize: 16.0, color: Colors.black), // 종료 텍스트 크기 변경
+                                    ),
+                                  ),
+                                  Positioned(
+                                    left: 60, // 체크박스의 위치를 조정
+                                    top: 0,
+                                    child: Checkbox(
+                                      value: _isEndDateEnabled,
+                                      onChanged: (bool? value) {
+                                        setState(() {
+                                          _isEndDateEnabled = value ?? false;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  Positioned(
+                                    left: 100,
+                                    top: 0,
+                                    child: Container(
                                       height: 40, // 버튼 높이 줄이기
+                                      width: 145, // 종료 날짜 선택 버튼 너비 고정
                                       decoration: BoxDecoration(
                                         color: Colors.white,
                                         border: Border.all(color: Colors.black),
-                                        borderRadius: SmoothBorderRadius(
-                                          cornerRadius: 6,
-                                          cornerSmoothing: 0.6,
-                                        ),
+                                        borderRadius: BorderRadius.all(Radius.circular(4)), // 곡률을 줄여 사각형에 가깝게 설정
                                       ),
                                       child: ElevatedButton(
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.white,
-                                          // 배경색 흰색
-                                          foregroundColor: Colors.black,
-                                          // 텍스트 색상 검은색
+                                          backgroundColor: Colors.white, // 배경색 흰색
+                                          foregroundColor: Colors.black, // 텍스트 색상 검은색
                                           shadowColor: Colors.transparent,
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: SmoothBorderRadius(
-                                              cornerRadius: 6,
-                                              cornerSmoothing: 0.6,
-                                            ),
+                                            borderRadius: BorderRadius.circular(4), // 곡률을 줄여 사각형에 가깝게 설정
                                           ),
-
                                           elevation: 0, // 그림자 제거
                                         ),
-                                        onPressed: () =>
-                                            _showDatePicker(context, false),
+                                        onPressed: _isEndDateEnabled ? () => _showDatePicker(context, false) : null,
                                         child: Text(
-                                          '${_selectedPeriod.end.toLocal()}'
-                                              .split(' ')[0],
-                                          style: const TextStyle(
-                                              fontSize: 16.0,
-                                              color: Colors.black),
+                                          _formatDate(_selectedPeriod.end), // 날짜 형식 변경
+                                          style: TextStyle(
+                                            fontSize: 15.0,
+                                            color: _isEndDateEnabled ? Colors.black : Colors.grey,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ],
+                                  ),
+                                  SizedBox(width: 2), // 날짜와 시간 위젯 사이의 간격
+                                  Container(
+                                    height: 40,
+                                    width: 70, // 종료 시간 선택 너비를 줄임
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      border: Border.all(color: Colors.black),
+                                      borderRadius: BorderRadius.all(Radius.circular(4)),
+                                    ),
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: Colors.black,
+                                        shadowColor: Colors.transparent,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        elevation: 0,
+                                      ),
+                                      onPressed: _isEndDateEnabled ? () => _showTimePicker(context, false) : null,
+                                      child: Text(
+                                        _formatTime(_endTime),
+                                        style: TextStyle(fontSize: 13.0, color: _isEndDateEnabled ? Colors.black : Colors.grey), // 텍스트 크기 조정
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(left: 10.0, right: 5.0, top: 0.0, bottom: 10.0), // 패딩 조정
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(color: Colors.grey), // 언더라인 추가
+                              ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 5), // 요소 간의 간격
                       Stack(
@@ -312,8 +378,7 @@ class AddTodoOverlayState extends State<AddTodoOverlay> {
                           const TextField(
                             decoration: InputDecoration(
                               hintText: '카테고리',
-                              hintStyle:
-                              TextStyle(color: Colors.grey, fontSize: 16.0),
+                              hintStyle: TextStyle(color: Colors.grey, fontSize: 16.0),
                               // 텍스트 크기 변경
                               contentPadding: EdgeInsets.only(left: 40.0),
                               // 오른쪽으로 이동
@@ -342,8 +407,7 @@ class AddTodoOverlayState extends State<AddTodoOverlay> {
                           const TextField(
                             decoration: InputDecoration(
                               hintText: '메모',
-                              hintStyle:
-                              TextStyle(color: Colors.grey, fontSize: 16.0),
+                              hintStyle: TextStyle(color: Colors.grey, fontSize: 16.0),
                               contentPadding: EdgeInsets.only(left: 40.0),
                               enabledBorder: InputBorder.none,
                               focusedBorder: InputBorder.none,
@@ -369,8 +433,7 @@ class AddTodoOverlayState extends State<AddTodoOverlay> {
             Container(
               color: Colors.black, // 검은색 라인
               height: 1.0, // 라인의 두께
-              margin: const EdgeInsets.symmetric(
-                  horizontal: 15.0), // 스크롤 영역의 언더라인과 같은 길이로 설정
+              margin: const EdgeInsets.symmetric(horizontal: 15.0), // 스크롤 영역의 언더라인과 같은 길이로 설정
             ),
             SizedBox(
               height: 50.0, // 고정된 영역의 높이 설정
