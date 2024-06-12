@@ -26,6 +26,9 @@ class ScheduleForm extends StatefulWidget {
 class _ScheduleFormState extends State<ScheduleForm> {
   bool _isEndDateEnabled = false;
 
+  double _startTextSpacing = 10.0;  // 시작 텍스트와 날짜 위젯 간의 간격
+  double _endTextSpacing = 10.0;    // 종료 텍스트와 날짜 위젯 간의 간격
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -88,7 +91,7 @@ class _ScheduleFormState extends State<ScheduleForm> {
                                 style: TextStyle(fontSize: 16.0, color: Colors.black), // 시작 텍스트 크기 변경
                               ),
                             ),
-                            SizedBox(width: 10),
+                            SizedBox(width: 48), // 시작 텍스트와 날짜 위젯 사이 거리 조정
                             Container(
                               height: 40, // 버튼 높이 줄이기
                               decoration: BoxDecoration(
@@ -126,7 +129,18 @@ class _ScheduleFormState extends State<ScheduleForm> {
                                 style: TextStyle(fontSize: 16.0, color: Colors.black), // 종료 텍스트 크기 변경
                               ),
                             ),
-                            SizedBox(width: 10),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 0.0), // 텍스트와 체크박스 사이 간격을 줄임
+                              child: Checkbox(
+                                value: _isEndDateEnabled,
+                                onChanged: (bool? value) {
+                                  setState(() {
+                                    _isEndDateEnabled = value ?? false;
+                                  });
+                                },
+                              ),
+                            ),
+                            SizedBox(width: 0), // 종료 텍스트와 날짜 위젯 사이 거리 조정
                             Container(
                               height: 40, // 버튼 높이 줄이기
                               decoration: BoxDecoration(
@@ -154,17 +168,6 @@ class _ScheduleFormState extends State<ScheduleForm> {
                                     color: _isEndDateEnabled ? Colors.black : Colors.grey,
                                   ),
                                 ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 0.0), // 텍스트와 체크박스 사이 간격을 줄임
-                              child: Checkbox(
-                                value: _isEndDateEnabled,
-                                onChanged: (bool? value) {
-                                  setState(() {
-                                    _isEndDateEnabled = value ?? false;
-                                  });
-                                },
                               ),
                             ),
                           ],
