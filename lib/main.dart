@@ -205,7 +205,7 @@ class MainPageState extends State<MainPage> {
           Column(
             children: <Widget>[
               SizedBox(
-                height: 0.03.sh,
+                height: 0.04.sh,
               ),
               Consumer<PageNotifier>(
                 builder: (context, notifier, child) {
