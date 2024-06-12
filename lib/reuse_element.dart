@@ -18,7 +18,7 @@ class TopMenu extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0.0,
       leading: GestureDetector(
         onTap: () {
-          // 메뉴바 확장
+          Scaffold.of(context).openDrawer();
         },
         child: Container(
           width: 40,

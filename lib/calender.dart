@@ -17,12 +17,28 @@ class Calendar {
   }
 }
 
-class CalendarEvent {
-  final DateTime date;
-  final String event;
+class Event {
+  final Calendar date;
+  String event;
 
-  const CalendarEvent({
+  Event({
     required this.date,
-    required this.event,
+    this.event = "(제목 없음)",
   });
+}
+
+class EventManager {
+  List<Event> events = [];
+
+  void addEvent(Calendar date, String event) {
+    events.add(Event(date: date, event: event));
+  }
+
+  void deleteEvent(Calendar date, int index){
+    events.removeAt(index);
+  }
+
+  List<Event> getEventsForDate(Calendar date) {
+    return events.where((event) => event.date.year == date.year && event.date.month == date.month && event.date.day == date.day).toList();
+  }
 }

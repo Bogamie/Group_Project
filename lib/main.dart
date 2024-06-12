@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:group_project_calendar/calender.dart';
 import 'package:group_project_calendar/reuse_element.dart';
-import 'package:provider/provider.dart';
+import 'package:group_project_calendar/menu_bar.dart';
+import 'package:group_project_calendar/add_event.dart';
 
 void main() {
   runApp(
@@ -70,7 +72,6 @@ class SelectNotifier extends ChangeNotifier {
     notifyListeners();
   }
 }
-
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -139,7 +140,6 @@ class MainPageState extends State<MainPage> {
     return Column(
       children: <Widget>[
         Container(
-          // color: Colors.transparent,
           width: width,
           height: height,
           alignment: Alignment.topCenter,
@@ -194,12 +194,13 @@ class MainPageState extends State<MainPage> {
         onMoveTo: () => _jumpPage(
             (DateTime.now().year - 1970) * 12 + DateTime.now().month - 1),
       ),
+      drawer: Drawer(),
       body: Stack(
         children: [
           Column(
             children: <Widget>[
               SizedBox(
-                height: 0.05.sh,
+                height: 0.03.sh,
               ),
               Consumer<PageNotifier>(
                 builder: (context, notifier, child) {
@@ -261,132 +262,138 @@ class MainPageState extends State<MainPage> {
                   ),
                 ),
               ),
-              Expanded(child: Consumer<PageNotifier>(
-                builder: (context, notifier, child) {
-                  int page = notifier.currentPage;
-                  return PageView.builder(
-                    controller: _controller,
-                    itemBuilder: (_, index) {
-                      int year = 1970 + index ~/ 12;
-                      int month = index % 12 + 1;
-                      return Column(
-                        children: <Widget>[
-                          Stack(
-                            children: <Widget>[
-                              Wrap(
-                                children: List.generate(
-                                  _getWeekCount(year, month) * 7,
-                                  (index) {
-                                    int week = _getWeekCount(year, month);
-                                    double w = 1.sw / 7.0;
-                                    double h =
-                                        (0.78.sh - 2 * (week - 1)) / week;
-                                    int startDay =
-                                        DateTime(year, month, 1).weekday % 7;
-                                    int dayOfMonth =
-                                        DateTime(year, month + 1, 0).day;
-                                    if (index < startDay % 7) {
-                                      return GestureDetector(
-                                        onTap: () => _animatePage(page - 1),
-                                        child: _buildDayContainer(
-                                          width: w,
-                                          height: h,
-                                          text:
-                                              "${DateTime(year, month, 0).day + index - startDay + 1}",
-                                          textColor: _getColor(index, 0.2),
-                                        ),
-                                      );
-                                    } else if (index >= dayOfMonth + startDay) {
-                                      return GestureDetector(
-                                        onTap: () => _animatePage(page + 1),
-                                        child: _buildDayContainer(
+              Expanded(
+                child: Consumer<PageNotifier>(
+                  builder: (context, notifier, child) {
+                    int page = notifier.currentPage;
+                    return PageView.builder(
+                      controller: _controller,
+                      itemBuilder: (_, index) {
+                        int year = 1970 + index ~/ 12;
+                        int month = index % 12 + 1;
+                        return Column(
+                          children: <Widget>[
+                            Stack(
+                              children: <Widget>[
+                                Wrap(
+                                  children: List.generate(
+                                    _getWeekCount(year, month) * 7,
+                                    (index) {
+                                      int week = _getWeekCount(year, month);
+                                      double w = 1.sw / 7.0;
+                                      double h =
+                                          (0.79.sh - 2 * (week - 1)) / week;
+                                      int startDay =
+                                          DateTime(year, month, 1).weekday % 7;
+                                      int dayOfMonth =
+                                          DateTime(year, month + 1, 0).day;
+                                      if (index < startDay % 7) {
+                                        return GestureDetector(
+                                          onTap: () => _animatePage(page - 1),
+                                          child: _buildDayContainer(
                                             width: w,
                                             height: h,
                                             text:
-                                                "${index - startDay - dayOfMonth + 1}",
-                                            textColor: _getColor(index, 0.2)),
-                                      );
-                                    } else {
-                                      Calendar cal = Calendar(
-                                        year: year,
-                                        month: month,
-                                        day: index - startDay + 1,
-                                      );
-                                      return GestureDetector(
-                                        onTap: () {
-                                          Provider.of<SelectNotifier>(context,
-                                                  listen: false)
-                                              .selectDay(cal);
-                                        },
-                                        child: Consumer<SelectNotifier>(
-                                          builder: (context, selection, child) {
-                                            return _buildDayContainer(
+                                                "${DateTime(year, month, 0).day + index - startDay + 1}",
+                                            textColor: _getColor(index, 0.2),
+                                          ),
+                                        );
+                                      } else if (index >=
+                                          dayOfMonth + startDay) {
+                                        return GestureDetector(
+                                          onTap: () => _animatePage(page + 1),
+                                          child: _buildDayContainer(
                                               width: w,
                                               height: h,
-                                              text: "${index - startDay + 1}",
-                                              borderColor: cal.isSelect
-                                                  ? const Color.fromRGBO(
-                                                      170, 170, 170, 1)
-                                                  : Colors.transparent,
-                                              color: cal.isToday
-                                                  ? const Color.fromRGBO(
-                                                      255, 49, 49, 0.4)
-                                                  : Colors.transparent,
-                                              textColor: _getColor(index, 1.0),
-                                            );
+                                              text:
+                                                  "${index - startDay - dayOfMonth + 1}",
+                                              textColor: _getColor(index, 0.2)),
+                                        );
+                                      } else {
+                                        Calendar cal = Calendar(
+                                          year: year,
+                                          month: month,
+                                          day: index - startDay + 1,
+                                        );
+                                        return GestureDetector(
+                                          onTap: () {
+                                            Provider.of<SelectNotifier>(context,
+                                                    listen: false)
+                                                .selectDay(cal);
                                           },
-                                        ),
-                                      );
-                                    }
-                                  },
+                                          child: Consumer<SelectNotifier>(
+                                            builder:
+                                                (context, selection, child) {
+                                              return _buildDayContainer(
+                                                width: w,
+                                                height: h,
+                                                text: "${index - startDay + 1}",
+                                                borderColor: cal.isSelect
+                                                    ? const Color.fromRGBO(
+                                                        170, 170, 170, 1)
+                                                    : Colors.transparent,
+                                                color: cal.isToday
+                                                    ? const Color.fromRGBO(
+                                                        255, 49, 49, 0.4)
+                                                    : Colors.transparent,
+                                                textColor:
+                                                    _getColor(index, 1.0),
+                                              );
+                                            },
+                                          ),
+                                        );
+                                      }
+                                    },
+                                  ),
                                 ),
-                              ),
-                              Wrap(
-                                // 라인 출력
-                                children: List.generate(
-                                  _getWeekCount(year, month) - 1,
-                                  (index) {
-                                    return Column(
-                                      children: [
-                                        SizedBox(
-                                          height: (0.78.sh -
-                                                  2 *
-                                                      (_getWeekCount(
-                                                              year, month) -
-                                                          1)) /
-                                              _getWeekCount(year, month),
-                                        ),
-                                        Align(
-                                          alignment: Alignment.center,
-                                          child: Container(
-                                            width: 0.99.sw,
-                                            height: 1,
-                                            decoration: BoxDecoration(
-                                              color: const Color.fromRGBO(
-                                                  229, 229, 229, 1),
-                                              borderRadius: SmoothBorderRadius(
-                                                cornerRadius: 10,
-                                                cornerSmoothing: 0.6,
+                                Wrap(
+                                  // 라인 출력
+                                  children: List.generate(
+                                    _getWeekCount(year, month) - 1,
+                                    (index) {
+                                      return Column(
+                                        children: [
+                                          SizedBox(
+                                            height: (0.79.sh -
+                                                    2 *
+                                                        (_getWeekCount(
+                                                                year, month) -
+                                                            1)) /
+                                                _getWeekCount(year, month),
+                                          ),
+                                          Align(
+                                            alignment: Alignment.center,
+                                            child: Container(
+                                              width: 0.99.sw,
+                                              height: 1,
+                                              decoration: BoxDecoration(
+                                                color: const Color.fromRGBO(
+                                                    229, 229, 229, 1),
+                                                borderRadius:
+                                                    SmoothBorderRadius(
+                                                  cornerRadius: 10,
+                                                  cornerSmoothing: 0.6,
+                                                ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                        const SizedBox(
-                                          height: 1,
-                                        ),
-                                      ],
-                                    );
-                                  },
+                                          const SizedBox(
+                                            height: 1,
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
-              )),
+                              ],
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
             ],
           ),
           Align(
@@ -410,6 +417,14 @@ class MainPageState extends State<MainPage> {
                     child: const Icon(Icons.event_rounded),
                     label: '이벤트',
                     shape: const CircleBorder(),
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AddEventOverlay();
+                        },
+                      );
+                    },
                   ),
                   SpeedDialChild(
                     child: const Icon(Icons.event_available_rounded),
