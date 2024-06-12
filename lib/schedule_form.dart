@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_date_pickers/flutter_date_pickers.dart' as dp;
 
-class ScheduleForm extends StatelessWidget {
+class ScheduleForm extends StatefulWidget {
   final Color fabColor;
   final DateTime firstDate;
   final DateTime lastDate;
@@ -18,6 +18,13 @@ class ScheduleForm extends StatelessWidget {
     required this.onDateSelected,
     required this.onColorSelected,
   });
+
+  @override
+  _ScheduleFormState createState() => _ScheduleFormState();
+}
+
+class _ScheduleFormState extends State<ScheduleForm> {
+  bool _isEndDateEnabled = false;
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +65,7 @@ class ScheduleForm extends StatelessWidget {
                             width: 20, // 작은 원형 버튼 크기
                             height: 20, // 작은 원형 버튼 크기
                             decoration: BoxDecoration(
-                              color: fabColor,
+                              color: widget.fabColor,
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -101,7 +108,7 @@ class ScheduleForm extends StatelessWidget {
                                 ),
                                 onPressed: () => _showDatePicker(context, true),
                                 child: Text(
-                                  '${selectedPeriod.start.toLocal()}'.split(' ')[0],
+                                  '${widget.selectedPeriod.start.toLocal()}'.split(' ')[0],
                                   style: TextStyle(fontSize: 16.0, color: Colors.black),
                                 ),
                               ),
@@ -109,54 +116,66 @@ class ScheduleForm extends StatelessWidget {
                           ],
                         ),
                         SizedBox(height: 0), // 시작과 종료 사이의 간격을 줄임
-                        Stack(
+                        Row(
                           children: [
                             Container(
-                              padding: EdgeInsets.only(left: 10.0, right: 5.0, top: 35.0, bottom: 15.0), // 패딩 조정
+                              alignment: Alignment.centerLeft, // 왼쪽 정렬
+                              padding: EdgeInsets.only(left: 10.0, top: 10.0, bottom: 10.0), // 패딩 조정
+                              child: Text(
+                                '종료',
+                                style: TextStyle(fontSize: 16.0, color: Colors.black), // 종료 텍스트 크기 변경
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Container(
+                              height: 40, // 버튼 높이 줄이기
                               decoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(color: Colors.grey), // 언더라인 추가
+                                color: Colors.white,
+                                border: Border.all(color: Colors.black),
+                                borderRadius: BorderRadius.all(Radius.circular(4)), // 곡률을 줄여 사각형에 가깝게 설정
+                              ),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white, // 배경색 흰색
+                                  foregroundColor: Colors.black, // 텍스트 색상 검은색
+                                  shadowColor: Colors.transparent,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(4), // 곡률을 줄여 사각형에 가깝게 설정
+                                  ),
+                                  elevation: 0, // 그림자 제거
+                                ),
+                                onPressed: _isEndDateEnabled
+                                    ? () => _showDatePicker(context, false)
+                                    : null,
+                                child: Text(
+                                  '${widget.selectedPeriod.end.toLocal()}'.split(' ')[0],
+                                  style: TextStyle(
+                                    fontSize: 16.0,
+                                    color: _isEndDateEnabled ? Colors.black : Colors.grey,
+                                  ),
                                 ),
                               ),
                             ),
-                            Row(
-                              children: [
-                                Container(
-                                  alignment: Alignment.centerLeft, // 왼쪽 정렬
-                                  padding: EdgeInsets.only(left: 10.0, top: 10.0, bottom: 10.0), // 패딩 조정
-                                  child: Text(
-                                    '종료',
-                                    style: TextStyle(fontSize: 16.0, color: Colors.black), // 종료 텍스트 크기 변경
-                                  ),
-                                ),
-                                SizedBox(width: 10),
-                                Container(
-                                  height: 40, // 버튼 높이 줄이기
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    border: Border.all(color: Colors.black),
-                                    borderRadius: BorderRadius.all(Radius.circular(4)), // 곡률을 줄여 사각형에 가깝게 설정
-                                  ),
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.white, // 배경색 흰색
-                                      foregroundColor: Colors.black, // 텍스트 색상 검은색
-                                      shadowColor: Colors.transparent,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(4), // 곡률을 줄여 사각형에 가깝게 설정
-                                      ),
-                                      elevation: 0, // 그림자 제거
-                                    ),
-                                    onPressed: () => _showDatePicker(context, false),
-                                    child: Text(
-                                      '${selectedPeriod.end.toLocal()}'.split(' ')[0],
-                                      style: TextStyle(fontSize: 16.0, color: Colors.black),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 0.0), // 텍스트와 체크박스 사이 간격을 줄임
+                              child: Checkbox(
+                                value: _isEndDateEnabled,
+                                onChanged: (bool? value) {
+                                  setState(() {
+                                    _isEndDateEnabled = value ?? false;
+                                  });
+                                },
+                              ),
                             ),
                           ],
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(left: 10.0, right: 5.0, top: 0.0, bottom: 10.0), // 패딩 조정
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(color: Colors.grey), // 언더라인 추가
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -366,13 +385,13 @@ class ScheduleForm extends StatelessWidget {
           height: 400,
           padding: EdgeInsets.all(16.0),
           child: dp.RangePicker(
-            selectedPeriod: selectedPeriod,
+            selectedPeriod: widget.selectedPeriod,
             onChanged: (dp.DatePeriod newPeriod) {
-              onDateSelected(newPeriod);
+              widget.onDateSelected(newPeriod);
               Navigator.pop(context); // 날짜 선택 후 오버레이 닫기
             },
-            firstDate: firstDate,
-            lastDate: lastDate,
+            firstDate: widget.firstDate,
+            lastDate: widget.lastDate,
             datePickerStyles: dp.DatePickerRangeStyles(
               selectedPeriodLastDecoration: BoxDecoration(
                 color: Colors.blue,
@@ -429,7 +448,7 @@ class ScheduleForm extends StatelessWidget {
   Widget _buildColorOption(BuildContext context, Color color) {
     return GestureDetector(
       onTap: () {
-        onColorSelected(color);
+        widget.onColorSelected(color);
         Navigator.pop(context);
       },
       child: Container(
