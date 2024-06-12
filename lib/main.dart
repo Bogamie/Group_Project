@@ -7,6 +7,7 @@ import 'package:group_project_calendar/calender.dart';
 import 'package:group_project_calendar/reuse_element.dart';
 import 'package:group_project_calendar/menu_bar.dart';
 import 'package:group_project_calendar/add_event.dart';
+import 'package:group_project_calendar/add_todo.dart';
 
 void main() {
   runApp(
@@ -27,8 +28,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ScreenUtil.init(context);
-    return const MaterialApp(
-      home: MainPage(),
+    return MaterialApp(
+      theme: ThemeData(
+        useMaterial3: false,
+      ),
+      home: const MainPage(),
     );
   }
 }
@@ -189,6 +193,7 @@ class MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       extendBodyBehindAppBar: true,
       appBar: TopMenu(
         onMoveTo: () => _jumpPage(
@@ -430,6 +435,14 @@ class MainPageState extends State<MainPage> {
                     child: const Icon(Icons.event_available_rounded),
                     label: '할일',
                     shape: const CircleBorder(),
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AddTodoOverlay();
+                        },
+                      );
+                    },
                   ),
                 ],
               ),

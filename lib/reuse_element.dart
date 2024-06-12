@@ -90,6 +90,7 @@ class TopMenu extends StatelessWidget implements PreferredSizeWidget {
                   "${DateTime.now().day}",
                   style: const TextStyle(
                     letterSpacing: -0.2,
+                    color: Colors.black,
                   ),
                 ),
               ),

@@ -4,14 +4,13 @@ import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter_date_pickers/flutter_date_pickers.dart' as dp;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class AddEventOverlay extends StatefulWidget {
-  const AddEventOverlay({super.key});
+class AddTodoOverlay extends StatefulWidget {
+  const AddTodoOverlay({super.key});
 
-  @override
-  AddEventOverlayState createState() => AddEventOverlayState();
+  AddTodoOverlayState createState() => AddTodoOverlayState();
 }
 
-class AddEventOverlayState extends State<AddEventOverlay> {
+class AddTodoOverlayState extends State<AddTodoOverlay> {
   Color _fabColor = Colors.grey;
   final DateTime _firstDate = DateTime.now().subtract(const Duration(days: 30));
   final DateTime _lastDate = DateTime.now().add(const Duration(days: 30));
@@ -110,7 +109,7 @@ class AddEventOverlayState extends State<AddEventOverlay> {
   @override
   Widget build(BuildContext context) {
     double width = 0.9.sw; // 화면 너비의 90%
-    double height = 0.9.sh; // 화면 높이의 90%
+    double height = 0.42.sh; // 화면 높이의 90%
 
     return Dialog(
       backgroundColor: Colors.white,
@@ -141,7 +140,7 @@ class AddEventOverlayState extends State<AddEventOverlay> {
                             decoration: InputDecoration(
                               hintText: '제목',
                               hintStyle:
-                                  TextStyle(color: Colors.grey, fontSize: 18.0),
+                              TextStyle(color: Colors.grey, fontSize: 18.0),
                               // 제목 텍스트 크기 변경
                               contentPadding: EdgeInsets.only(left: 10.0),
                               // 오른쪽으로 이동
@@ -258,7 +257,7 @@ class AddEventOverlayState extends State<AddEventOverlay> {
                                         style: TextStyle(
                                             fontSize: 16.0,
                                             color:
-                                                Colors.black), // 종료 텍스트 크기 변경
+                                            Colors.black), // 종료 텍스트 크기 변경
                                       ),
                                     ),
                                     const SizedBox(width: 10),
@@ -310,7 +309,7 @@ class AddEventOverlayState extends State<AddEventOverlay> {
                             decoration: InputDecoration(
                               hintText: '카테고리',
                               hintStyle:
-                                  TextStyle(color: Colors.grey, fontSize: 16.0),
+                              TextStyle(color: Colors.grey, fontSize: 16.0),
                               // 텍스트 크기 변경
                               contentPadding: EdgeInsets.only(left: 40.0),
                               // 오른쪽으로 이동
@@ -338,99 +337,9 @@ class AddEventOverlayState extends State<AddEventOverlay> {
                         children: [
                           const TextField(
                             decoration: InputDecoration(
-                              hintText: '알림',
-                              hintStyle:
-                                  TextStyle(color: Colors.grey, fontSize: 16.0),
-                              // 텍스트 크기 변경
-                              contentPadding: EdgeInsets.only(left: 40.0),
-                              // 오른쪽으로 이동
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            left: 5, // 오른쪽으로 이동
-                            top: 10, // 아이콘의 위치를 적절히 조정
-                            child: SvgPicture.asset(
-                              'assets/icons/alarm.svg', // SVG 파일 경로
-                              width: 24,
-                              height: 24,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 5), // 요소 간의 간격
-                      Stack(
-                        children: [
-                          const TextField(
-                            decoration: InputDecoration(
-                              hintText: '반복',
-                              hintStyle:
-                                  TextStyle(color: Colors.grey, fontSize: 16.0),
-                              // 텍스트 크기 변경
-                              contentPadding: EdgeInsets.only(left: 40.0),
-                              // 오른쪽으로 이동
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            left: 5, // 오른쪽으로 이동
-                            top: 10, // 아이콘의 위치를 적절히 조정
-                            child: SvgPicture.asset(
-                              'assets/icons/repeat.svg', // SVG 파일 경로
-                              width: 24,
-                              height: 24,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 5), // 요소 간의 간격
-                      Stack(
-                        children: [
-                          const TextField(
-                            decoration: InputDecoration(
-                              hintText: '장소',
-                              hintStyle:
-                                  TextStyle(color: Colors.grey, fontSize: 16.0),
-                              // 텍스트 크기 변경
-                              contentPadding: EdgeInsets.only(left: 40.0),
-                              // 오른쪽으로 이동
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            left: 5, // 오른쪽으로 이동
-                            top: 10, // 아이콘의 위치를 적절히 조정
-                            child: SvgPicture.asset(
-                              'assets/icons/place.svg', // SVG 파일 경로
-                              width: 24,
-                              height: 24,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 5), // 요소 간의 간격
-                      Stack(
-                        children: [
-                          const TextField(
-                            decoration: InputDecoration(
                               hintText: '메모',
                               hintStyle:
-                                  TextStyle(color: Colors.grey, fontSize: 16.0),
+                              TextStyle(color: Colors.grey, fontSize: 16.0),
                               // 텍스트 크기 변경
                               contentPadding: EdgeInsets.only(left: 40.0),
                               // 오른쪽으로 이동
