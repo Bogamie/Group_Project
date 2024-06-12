@@ -26,10 +26,19 @@ class ScheduleForm extends StatefulWidget {
 
 class _ScheduleFormState extends State<ScheduleForm> {
   bool _isEndDateEnabled = false;
+  TimeOfDay _startTime = TimeOfDay.now();
+  TimeOfDay _endTime = TimeOfDay.now();
 
   String _formatDate(DateTime date) {
     final DateFormat formatter = DateFormat('yyyy년 M월 d일');
     return formatter.format(date);
+  }
+
+  String _formatTime(TimeOfDay time) {
+    final now = DateTime.now();
+    final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+    final format = DateFormat.Hm(); // 24시간 형식
+    return format.format(dt);
   }
 
   double _endTextToCheckboxSpacing = 0.0; // 종료 텍스트와 체크박스 사이의 거리
@@ -96,10 +105,10 @@ class _ScheduleFormState extends State<ScheduleForm> {
                                 style: TextStyle(fontSize: 16.0, color: Colors.black), // 시작 텍스트 크기 변경
                               ),
                             ),
-                            SizedBox(width: 48), // 시작 텍스트와 날짜 위젯 사이의 거리
+                            SizedBox(width: 28), // 시작 텍스트와 날짜 위젯 사이의 거리
                             Container(
                               height: 40, // 버튼 높이 줄이기
-                              width: 170, // 버튼 너비 고정
+                              width: 170, // 시작 날짜 선택 버튼 너비 고정
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 border: Border.all(color: Colors.black),
@@ -122,21 +131,52 @@ class _ScheduleFormState extends State<ScheduleForm> {
                                 ),
                               ),
                             ),
+                            SizedBox(width: 2), // 날짜와 시간 위젯 사이의 간격
+                            Container(
+                              height: 40,
+                              width: 90, // 시작 시간 선택 너비를 줄임
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(color: Colors.black),
+                                borderRadius: BorderRadius.all(Radius.circular(4)),
+                              ),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: Colors.black,
+                                  shadowColor: Colors.transparent,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                onPressed: () => _showTimePicker(context, true),
+                                child: Text(
+                                  _formatTime(_startTime),
+                                  style: TextStyle(fontSize: 14.0, color: Colors.black), // 텍스트 크기 조정
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                         SizedBox(height: 0), // 시작과 종료 사이의 간격을 줄임
-                        Row(
+                        Stack(
                           children: [
-                            Container(
-                              alignment: Alignment.centerLeft, // 왼쪽 정렬
-                              padding: EdgeInsets.only(left: 10.0, top: 10.0, bottom: 10.0), // 패딩 조정
-                              child: Text(
-                                '종료',
-                                style: TextStyle(fontSize: 16.0, color: Colors.black), // 종료 텍스트 크기 변경
-                              ),
+                            Row(
+                              children: [
+                                Container(
+                                  alignment: Alignment.centerLeft, // 왼쪽 정렬
+                                  padding: EdgeInsets.only(left: 10.0, top: 10.0, bottom: 10.0), // 패딩 조정
+                                  child: Text(
+                                    '종료',
+                                    style: TextStyle(fontSize: 16.0, color: Colors.black), // 종료 텍스트 크기 변경
+                                  ),
+                                ),
+                              ],
                             ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: _endTextToCheckboxSpacing), // 텍스트와 체크박스 사이의 간격
+                            Positioned(
+                              left: 30, // 체크박스의 위치를 조정합니다.
+                              top: -2, // 원하는 높이로 조정합니다.
                               child: Checkbox(
                                 value: _isEndDateEnabled,
                                 onChanged: (bool? value) {
@@ -146,11 +186,12 @@ class _ScheduleFormState extends State<ScheduleForm> {
                                 },
                               ),
                             ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: _checkboxToEndDateSpacing), // 체크박스와 날짜 위젯 사이의 간격
+                            Positioned(
+                              left: 68, // 체크박스와 날짜 위젯의 간격 조정
+                              top: 0,
                               child: Container(
                                 height: 40, // 버튼 높이 줄이기
-                                width: 170, // 버튼 너비 고정
+                                width: 170, // 종료 날짜 선택 버튼 너비 고정
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   border: Border.all(color: Colors.black),
@@ -162,7 +203,8 @@ class _ScheduleFormState extends State<ScheduleForm> {
                                     foregroundColor: Colors.black, // 텍스트 색상 검은색
                                     shadowColor: Colors.transparent,
                                     shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(4)), // 곡률을 줄여 사각형에 가깝게 설정
+                                      borderRadius: BorderRadius.circular(4), // 곡률을 줄여 사각형에 가깝게 설정
+                                    ),
                                     elevation: 0, // 그림자 제거
                                   ),
                                   onPressed: _isEndDateEnabled
@@ -174,6 +216,37 @@ class _ScheduleFormState extends State<ScheduleForm> {
                                       fontSize: 16.0,
                                       color: _isEndDateEnabled ? Colors.black : Colors.grey,
                                     ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              left: 240, // 날짜와 시간 위젯의 간격 조정
+                              top: 0,
+                              child: Container(
+                                height: 40,
+                                width: 90, // 너비를 줄임
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(color: Colors.black),
+                                  borderRadius: BorderRadius.all(Radius.circular(4)),
+                                ),
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    foregroundColor: Colors.black,
+                                    shadowColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    elevation: 0,
+                                  ),
+                                  onPressed: _isEndDateEnabled
+                                      ? () => _showTimePicker(context, false)
+                                      : null,
+                                  child: Text(
+                                    _formatTime(_endTime),
+                                    style: TextStyle(fontSize: 14.0, color: _isEndDateEnabled ? Colors.black : Colors.grey), // 텍스트 크기 조정
                                   ),
                                 ),
                               ),
@@ -427,6 +500,23 @@ class _ScheduleFormState extends State<ScheduleForm> {
         );
       },
     );
+  }
+
+  void _showTimePicker(BuildContext context, bool isStart) {
+    showTimePicker(
+      context: context,
+      initialTime: isStart ? _startTime : _endTime,
+    ).then((pickedTime) {
+      if (pickedTime != null) {
+        setState(() {
+          if (isStart) {
+            _startTime = pickedTime;
+          } else {
+            _endTime = pickedTime;
+          }
+        });
+      }
+    });
   }
 
   void _showColorPickerOverlay(BuildContext context) {

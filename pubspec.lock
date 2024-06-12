@@ -126,7 +126,7 @@ packages:
     source: sdk
     version: "0.0.0"
   intl:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: intl
       sha256: "3bc132a9dbce73a7e4a21a17d06e1878839ffbf975568bc875c60537824b0c4d"
@@ -394,6 +394,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.1"
+  time_picker_widget:
+    dependency: "direct main"
+    description:
+      name: time_picker_widget
+      sha256: "2cae415159ff9ac4cb58bf118864c3131ae0155272e30ccd884a6bda1bac5032"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0+10"
   vector_math:
     dependency: transitive
     description:
